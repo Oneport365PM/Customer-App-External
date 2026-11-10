@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FDFBF1">
+<title>OnePort 365 · Customer App Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<style>
+/* Nohemi is not on Google Fonts. It is used if installed on the viewer's device; to embed it, add
+   @font-face{font-family:'Nohemi';src:url(Nohemi-SemiBold.woff2) format('woff2');font-weight:600}
+   (and 400/700) here. Falls back to Poppins. */
+:root{
+  --green:#023819; --light:#D1DBBD; --lime:#BFFB4F; --gold:#FFCC1A; --cream:#FDFBF1;
+  --ink:#383838; --muted:#5f665b; --line:rgba(2,56,25,.1); --tint:#EDEFE8;
+  --display:'Nohemi','Poppins',system-ui,sans-serif; --body:'Poppins',system-ui,sans-serif;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:#0b2a17;font-family:var(--body);color:var(--ink);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+.disp{font-family:var(--display);letter-spacing:-.01em}
+.muted{color:var(--muted)}
+:focus-visible{outline:3px solid rgba(191,251,79,.9);outline-offset:2px}
+
+/* ---------- stage ---------- */
+.stage{min-height:100%;display:flex;align-items:center;justify-content:center;gap:64px;padding:32px 24px}
+.intro{max-width:300px;color:var(--cream)}
+.intro .brand{font-family:var(--display);font-weight:700;font-size:18px}
+.intro .brand b{color:var(--lime)}
+.intro h1{font-family:var(--display);font-weight:600;font-size:32px;line-height:1.15;letter-spacing:-.02em;margin:20px 0 12px}
+.intro p{color:var(--light);font-size:15px;line-height:1.6;margin:0 0 24px}
+.restart{height:44px;padding:0 18px;border-radius:8px;border:1.5px solid rgba(253,251,241,.4);background:transparent;color:var(--cream);font-weight:600;font-size:14px;cursor:pointer}
+.restart:hover{background:rgba(255,255,255,.08)}
+.phone{width:390px;height:844px;border-radius:44px;padding:10px;background:#111;box-shadow:0 40px 80px -30px rgba(0,0,0,.7);flex-shrink:0}
+.app{position:relative;width:100%;height:100%;overflow:hidden;border-radius:34px;background:var(--cream)}
+@media (max-width:860px){.intro{display:none}}
+@media (max-width:500px){
+  body{background:var(--cream)}
+  .stage{padding:0;display:block;height:100%}
+  .phone{width:100%;height:100vh;height:100dvh;border-radius:0;padding:0;background:none;box-shadow:none}
+  .app{border-radius:0}
+}
+@media (min-width:501px) and (max-height:880px){.phone{transform:scale(calc(100vh / 900))}}
+
+/* ---------- shared ---------- */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column}
+.scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;white-space:nowrap}
+.chip.dot::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.st-pending{background:#FFF3CC;color:#7a5d00}.st-pending::before{background:#E0A800!important}
+.st-accepted{background:#E1F1E8;color:#0f7a45}.st-accepted::before{background:#1F8A5B!important}
+.st-rejected{background:var(--tint);color:#4a5a3f}.st-rejected::before{background:#808080!important}
+.btn{height:52px;width:100%;border-radius:8px;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:background .16s}
+.btn-accent{background:var(--lime);color:var(--green)}.btn-accent:hover{background:#a9e83a}
+.btn-solid{background:var(--green);color:var(--cream)}.btn-solid:hover{background:#0a4a25}
+.btn-outline{background:#fff;color:var(--green);border:1.5px solid var(--green)}.btn-outline:hover{background:#f4f6ef}
+.btn-text{background:transparent;color:var(--green);height:44px;font-size:14px}
+.btn-disabled{background:#8FA08B;color:#F4F6EF;cursor:not-allowed}
+.icon-btn{width:44px;height:44px;border-radius:10px;border:none;background:transparent;display:grid;place-items:center;cursor:pointer}
+.icon-btn:hover{background:rgba(2,56,25,.06)}
+h2.sec{font-family:var(--display);font-weight:600;font-size:16px;color:var(--green);margin:0 0 12px}
+.row{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+.row:last-child{border-bottom:none}
+.row span:first-child{color:var(--muted)}
+.row span:last-child{color:var(--green);font-weight:500;text-align:right}
+.svc{width:38px;height:38px;border-radius:10px;background:var(--tint);display:grid;place-items:center;flex-shrink:0}
+.head{flex-shrink:0;padding:20px 20px 8px;display:flex;align-items:center;justify-content:space-between;min-height:76px}
+.head h1{font-family:var(--display);font-weight:600;font-size:28px;color:var(--green);margin:0}
+.bar{flex-shrink:0;padding:8px 10px;display:flex;align-items:center;gap:4px}
+.filters{flex-shrink:0;display:flex;gap:8px;padding:8px 20px 12px;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filter{flex-shrink:0;height:36px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:var(--green);border:1px solid rgba(2,56,25,.18)}
+.filter.on{background:var(--lime);border-color:var(--lime)}
+.list{padding:0 20px 20px;display:flex;flex-direction:column;gap:10px}
+.tapcard{all:unset;box-sizing:border-box;width:100%;cursor:pointer;display:flex;flex-direction:column;gap:6px;padding:16px;background:#fff;border:1px solid var(--line);border-radius:12px;transition:border-color .16s}
+.tapcard:hover{border-color:rgba(2,56,25,.3)}
+.tapcard:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.tabbar{flex-shrink:0;background:#fff;border-top:1px solid var(--line);padding:8px 8px calc(14px + var(--safe-b));display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.tab{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:500;color:var(--muted);position:relative;padding:2px 0}
+.tab.on{color:var(--green);font-weight:600}
+.tab .ic{height:28px;padding:0 16px;border-radius:999px;display:grid;place-items:center}
+.tab.on .ic{background:var(--lime)}
+.tab .count{position:absolute;top:-4px;left:50%;margin-left:12px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--green);color:var(--lime);font-size:10.5px;font-weight:700;display:grid;place-items:center}
+.toast{position:absolute;left:16px;right:16px;bottom:calc(92px + var(--safe-b));z-index:40;display:flex;align-items:center;gap:10px;background:var(--green);color:var(--cream);border-radius:12px;padding:13px 14px;font-size:14px;font-weight:500;box-shadow:0 20px 45px -22px rgba(2,56,25,.8);animation:rise .22s ease}
+.toast[hidden]{display:none}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+
+/* ---------- quote detail ---------- */
+.actions{flex-shrink:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px calc(18px + var(--safe-b));display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions.one{grid-template-columns:1fr}
+.grp{background:#FFF8E0;color:#7a5d00;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:10px 16px}
+.line{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.amt{font-size:14px;font-weight:600;color:var(--green);white-space:nowrap;font-variant-numeric:tabular-nums}
+.subt{display:flex;justify-content:flex-end;gap:8px;padding:10px 0 12px;font-size:13px;color:var(--muted)}
+.subt b{color:var(--green);font-weight:600}
+.grand{display:flex;justify-content:space-between;align-items:center;background:var(--green);color:var(--cream);border-radius:12px;padding:16px;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.grand b{font-size:18px;color:#fff;letter-spacing:0;text-transform:none}
+.notice{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted)}
+.notice b{color:#7a5d00}
+.terms{margin:0 0 14px;padding-left:20px;font-size:13px;line-height:1.55;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+details{border-top:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:14px 0;font-size:14px;font-weight:500;color:var(--green)}
+summary::-webkit-details-marker{display:none}
+summary svg{transition:transform .2s}
+details[open] summary svg{transform:rotate(180deg)}
+.banner{margin:0;font-size:14px;line-height:1.5;border-radius:10px;padding:12px 14px}
+
+/* ---------- shipments ---------- */
+.prog{display:block;height:6px;border-radius:3px;background:var(--tint);overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;border-radius:3px;background:var(--green)}
+.prog.done i{background:#1F8A5B}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:flex;gap:14px}
+.tl .rail{display:flex;flex-direction:column;align-items:center;width:24px;flex:none}
+.tl .node{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;border:1.5px solid rgba(2,56,25,.25);background:#fff;flex:none}
+.tl .is-done .node{background:var(--green);border-color:var(--green)}
+.tl .current .node{background:var(--lime);border-color:var(--green)}
+.tl .current .node::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--green)}
+.tl .seg{width:2px;flex:1;min-height:20px;background:#DBE3DE}
+.tl .is-done .seg{background:var(--green)}
+.tl .body{flex:1;min-width:0;padding:2px 0 18px;display:flex;justify-content:space-between;gap:8px}
+.tl li:last-child .body{padding-bottom:0}
+.tl .label{font-weight:600;font-size:14px;color:var(--muted)}
+.tl .is-done .label,.tl .current .label{color:var(--green)}
+.update{margin:12px 0 0;padding:12px;border-radius:8px;background:#F4F6EF;font-size:13px;line-height:1.5;color:var(--ink)}
+
+/* ---------- account ---------- */
+.menu{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.mrow{all:unset;box-sizing:border-box;width:100%;cursor:pointer;display:flex;align-items:center;gap:14px;padding:15px 16px;border-bottom:1px solid var(--line);font-size:15px;font-weight:500;color:var(--green)}
+.mrow:last-child{border-bottom:none}
+.mrow:hover{background:#FBFCF8}
+.mrow:focus-visible{outline:3px solid var(--lime);outline-offset:-3px}
+.mrow .mi{width:34px;height:34px;border-radius:9px;background:var(--tint);display:grid;place-items:center;flex:none}
+.switch{all:unset;cursor:pointer;width:46px;height:28px;border-radius:14px;background:#C9D0C3;position:relative;flex:none;transition:background .18s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .18s}
+.switch[aria-checked="true"]{background:var(--green)}
+.switch[aria-checked="true"]::after{transform:translateX(18px);background:var(--lime)}
+.switch:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.avatar{width:56px;height:56px;border-radius:14px;background:var(--green);color:var(--lime);font-family:var(--display);font-weight:600;font-size:19px;display:grid;place-items:center;flex:none}
+
+/* ---------- home ---------- */
+.wordmark{font-family:var(--display);font-weight:700;font-size:20px;color:var(--green)}
+.wordmark b{color:#2F7A3F}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{all:unset;box-sizing:border-box;cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:6px;transition:border-color .16s}
+.stat:hover{border-color:rgba(2,56,25,.3)}
+.stat:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.stat b{font-family:var(--display);font-weight:600;font-size:28px;line-height:1;color:var(--green)}
+.stat span{font-size:12px;font-weight:500;color:var(--muted);line-height:1.3}
+.stat.hot{background:var(--green);border-color:var(--green)}
+.stat.hot b{color:var(--lime)}.stat.hot span{color:var(--light)}
+.sechead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sechead h2{font-family:var(--display);font-weight:600;font-size:17px;color:var(--green);margin:0}
+.link{all:unset;cursor:pointer;font-size:13px;font-weight:600;color:#2F7A3F;padding:8px 0}
+.link:focus-visible{outline:2px solid var(--green)}
+
+/* ---------- account panels ---------- */
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.panel-h{padding:16px 16px 12px;border-bottom:1px solid var(--line)}
+.panel-h h2{font-family:var(--display);font-weight:600;font-size:17px;color:var(--green);margin:0}
+.panel-h p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.panel-b{padding:16px}
+.panel-f{padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
+.ident{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.ident .nm{font-family:var(--display);font-weight:600;font-size:18px;color:var(--green);line-height:1.25}
+.mono{width:44px;height:44px;border-radius:10px;background:#E4EDE2;color:var(--green);font-weight:700;font-size:14px;display:grid;place-items:center;flex:none}
+.mono.round{border-radius:50%}
+.mono.xs{width:22px;height:22px;font-size:9.5px;border-radius:50%}
+.kgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.kgrid .full{grid-column:1/-1}
+.k{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.v{font-size:14px;color:var(--ink);word-break:break-word;display:flex;align-items:center;gap:6px}
+.v a{color:#2F7A3F;text-decoration:none;font-weight:500}
+.tier{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:6px;border:1px solid rgba(2,56,25,.25);background:#EDEFE8;color:var(--green)}
+.btn-sm{height:40px;width:auto;padding:0 16px;font-size:14px;gap:8px}
+
+/* ---------- documents ---------- */
+.doc{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.doc:last-child{border-bottom:none}
+.doc .fi{width:36px;height:36px;border-radius:9px;background:var(--tint);display:grid;place-items:center;flex:none}
+.doc .fi.need{background:#FFF3CC}
+.doc .dn{font-size:14px;font-weight:600;color:var(--green)}
+.doc .dm{font-size:12px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.subhead{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:12px 0 2px}
+.dropzone{all:unset;box-sizing:border-box;width:100%;cursor:pointer;border:1.5px dashed rgba(2,56,25,.35);border-radius:10px;padding:16px;display:flex;align-items:center;gap:12px;background:#FBFCF8}
+.dropzone:hover{border-color:var(--green)}
+.dropzone.has{border-style:solid;border-color:var(--green);background:#fff}
+.dropzone:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.rchip{height:36px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:500;cursor:pointer;background:#fff;color:var(--green);border:1px solid rgba(2,56,25,.22)}
+.rchip.on{background:var(--green);color:var(--lime);border-color:var(--green)}
+.inp{display:block;width:100%;border:none;outline:none;padding:0;font-family:var(--body);font-size:15px;color:var(--ink);background:transparent}
+.field.compact{padding:14px 14px 12px}
+.field.compact:focus-within{padding:13.5px 13.5px 11.5px}
+.ferr{font-size:12px;color:#cc1414;font-weight:500;margin-top:4px;min-height:0}
+.sheet.tall{max-height:92%;overflow-y:auto}
+
+/* ---------- sheets ---------- */
+.overlay{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;justify-content:flex-end}
+.scrim{position:absolute;inset:0;border:none;padding:0;background:rgba(1,28,12,.5);cursor:pointer}
+.sheet{position:relative;background:#fff;border-radius:20px 20px 0 0;padding:12px 20px calc(20px + var(--safe-b));display:flex;flex-direction:column;gap:16px}
+.anim .scrim{animation:fade .2s ease}.anim .sheet{animation:up .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes fade{from{opacity:0}}@keyframes up{from{transform:translateY(100%)}}
+.handle{width:40px;height:4px;border-radius:2px;background:var(--light);margin:0 auto}
+.field{position:relative;display:block;border-radius:8px;padding:16px 14px 12px;border:1.5px solid rgba(2,56,25,.35)}
+.field.filled{border-color:var(--green)}
+.field:focus-within{border:2px solid var(--green);padding:15.5px 13.5px 11.5px}
+.field.error,.field.error:focus-within{border:2px solid #FF1A1A;padding:15.5px 13.5px 11.5px}
+.flabel{position:absolute;top:-9px;left:11px;background:#fff;padding:0 5px;font-size:12px;font-weight:500;color:var(--muted)}
+.field.filled .flabel,.field:focus-within .flabel{color:var(--green)}
+.field.error .flabel{color:#cc1414}
+.field textarea{display:block;border:none;outline:none;width:100%;resize:none;font-family:var(--body);font-size:15px;line-height:1.5;color:var(--ink);background:transparent;min-height:110px;padding:0}
+.field textarea::placeholder{color:#8a8f86}
+
+/* ---------- done ---------- */
+.done{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 28px;gap:14px}
+.done-ic{width:80px;height:80px;border-radius:50%;display:grid;place-items:center;animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.4);opacity:0}}
+.foot{flex-shrink:0;padding:12px 20px calc(16px + var(--safe-b));display:flex;flex-direction:column;gap:4px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <aside class="intro" aria-label="About this prototype">
+    <div class="brand">OnePort<b>&nbsp;365</b></div>
+    <h1>Customer app prototype</h1>
+    <p>See what needs your attention, decide on quotes, track shipments, send documents and manage your account. Accepting a quote creates a shipment you can follow. Everything on the phone is clickable.</p>
+    <button class="restart" type="button" data-act="restart">Restart demo</button>
+  </aside>
+  <div class="phone"><div class="app"><div id="app" style="position:absolute;inset:0"></div><div class="toast" id="toast" role="status" hidden></div><input type="file" id="filepick" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx" hidden></div></div>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+var TODAY = '10 Nov 2026';
+var STATUS = { pending: 'Pending Decision', accepted: 'Accepted', rejected: 'Rejected' };
+
+var TERMS = [
+  'All documents related to clearing shipments is to be provided by the CLIENT where we do not handle documentation.',
+  'CLIENT to ensure that all the details are correct and in order.',
+  'CLIENT ensures that all permits required for the Importation of their commodity are provided and valid at the time of Import.',
+  'The Goods imported are the same as the Goods declared on all Documents provided.',
+  'CLIENT to ensure timely payment of Duty.',
+  'CLIENT to offload SERVICE PROVIDER’s Trucks within 24Hrs of arrival at Facility, Truck demurrage per day applies for delays @₦30,000.',
+  'CLIENT to provide Delivery address accurately on the DATASHEET.',
+  'Any force majeure, incident or accident will be notified to Client and necessary solutions will be provided.',
+  'Counter for number of days shall halt where we have to resolve queries or incomplete documentation.',
+  'For NAFDAC regulated items, Client to provide samples within 24 hrs of discharge of cargo at warehouse for submission to NAFDAC for 2nd stamping to effect full release.',
+  'Client to ensure quantities supplied as samples fit item of import & batch number as per the NAFDAC requirements.',
+  'Client to ensure all documentation regarding NAFDAC certificates, current year import permits and applicable HS codes are valid as per the standard import guidelines requirements.',
+  'For chemicals requiring EUC certificates, Client to ensure provision of certificates ahead of customs clearing.',
+  'All shipments from China and India must be accompanied by laboratory stamped CRIA.'
+];
+var NOTICE = 'Duty and tax advised are subject to verification and assessment by NCS upon arrival of cargo. 7.5% VAT will be applicable at the time of invoicing. Storage / detention / demurrage charges (if any) are as per receipted.';
+
+var SERVICE_ICON = { ocean: 'ship', air: 'plane', customs: 'stamp' };
+
+var QUOTES = [
+  { id: 'Q-26-11-024', status: 'pending', svc: 'ocean', service: 'Ocean Freight FCL',
+    from: 'Shanghai, China', to: 'Apapa, Lagos', route: 'CNSHA → NGAPP', date: '09 Nov 2026', validUntil: '16 Nov 2026',
+    details: [['Service', 'Ocean Freight FCL'], ['Route', 'CNSHA → NGAPP'], ['Container', '40FT × 2'], ['Class', 'FAK']],
+    sections: [
+      ['Haulage', [
+        ['APMT, Apapa Road, Lagos → Ikeja, Lagos', 'Unit 1 · Qty 2 · Per Container', 460000],
+        ['APMT, Apapa Road, Lagos → Ikeja, Lagos · 1×40FT', 'Unit 2 · Qty 2 · Per Truck', 690000]
+      ]],
+      ['Other charges', [
+        ['Customs Brokerage', 'Unit 2 · Qty 2 · Per Container', 120000]
+      ]]
+    ],
+    contact: ['Kayode Akintade', 'kayodea@oneport365.com'] },
+
+  { id: 'Q-26-11-015', status: 'pending', svc: 'customs', service: 'Customs Brokerage FCL',
+    from: 'Tin Can Island, Lagos', to: 'Gdańsk, Poland', route: 'NGTIN → PLGDN', date: '06 Nov 2026', validUntil: '13 Nov 2026',
+    details: [['Service', 'Customs Brokerage FCL'], ['Route', 'NGTIN → PLGDN'], ['Container', '40FT × 12'], ['Class', 'FAK']],
+    sections: [
+      ['Origin charge', [
+        ['Customs and Agency Clearance', 'Unit 12 · Qty 12 · Per Container', 450000],
+        ['Transloading / Labour (Tenzik)', 'Unit 12 · Qty 12 · Per Container', 1620000],
+        ['Handling Charge (Tenzik)', 'Unit 12 · Qty 12 · Per Container', 900000],
+        ['Trucking of Empties to Tenzik / TICT', 'Unit 12 · Qty 12 · Per Container', 9840000]
+      ]]
+    ],
+    contact: ['Gift Osaremen', 'gifto@oneport365.com'] },
+
+  { id: 'Q-26-11-018', status: 'pending', svc: 'air', service: 'Air Freight',
+    from: 'Frankfurt, Germany', to: 'Lagos, Nigeria', route: 'FRA → LOS', date: '08 Nov 2026', validUntil: '15 Nov 2026',
+    details: [['Service', 'Air Freight'], ['Route', 'FRA → LOS'], ['Chargeable weight', '342 kg'], ['Class', 'FAK']],
+    sections: [
+      ['Other charges', [
+        ['Clearing', 'Unit 1 · 342 kg · Per Shipment', 150000],
+        ['Delivery', 'Unit 1 · 342 kg · Per Shipment', 95000],
+        ['Sahco', 'Unit 1 · 342 kg · Per Shipment', 77702.4],
+        ['Faan', 'Unit 1 · 342 kg · Per Shipment', 5516.5]
+      ]]
+    ],
+    contact: ['Gift Osaremen', 'gifto@oneport365.com'] },
+
+  { id: 'Q-26-10-068', status: 'rejected', decided: '30 Oct 2026', reason: 'The haulage rate to Ikeja is above our budget for this shipment.',
+    svc: 'ocean', service: 'Ocean Freight FCL',
+    from: 'Buenos Aires, Argentina', to: 'Apapa, Lagos', route: 'ARBUE → NGAPP', date: '28 Oct 2026', validUntil: '04 Nov 2026',
+    details: [['Service', 'Ocean Freight FCL'], ['Route', 'ARBUE → NGAPP'], ['Container', '20FT × 5'], ['Class', 'FAK']],
+    sections: [
+      ['Haulage', [
+        ['APMT, Apapa Road, Lagos → Ikeja, Lagos', 'Unit 1 · Qty 5 · Per Container', 385000],
+        ['APMT, Apapa Road, Lagos → Ikeja, Lagos · 2×20FT', 'Unit 2 · Qty 5 · Per Truck', 1570000]
+      ]],
+      ['Other charges', [
+        ['Customs Brokerage', 'Unit 5 · Qty 5 · Per Container', 300000]
+      ]]
+    ],
+    contact: ['Kayode Akintade', 'kayodea@oneport365.com'] },
+
+  { id: 'Q-26-10-019', status: 'accepted', decided: '13 Oct 2026', svc: 'air', service: 'Air Freight',
+    from: 'Berlin, Germany', to: 'Lagos, Nigeria', route: 'BER → LOS', date: '12 Oct 2026', validUntil: '14 Oct 2026',
+    details: [['Service', 'Air Freight'], ['Route', 'BER → LOS'], ['Chargeable weight', '170.5 kg'], ['Class', 'FAK']],
+    sections: [
+      ['Other charges', [
+        ['Clearing', 'Unit 1 · 170.5 kg · Per Shipment', 150000],
+        ['Delivery', 'Unit 1 · 170.5 kg · Per Shipment', 80000],
+        ['Sahco', 'Unit 1 · 170.5 kg · Per Shipment', 38737.9],
+        ['Faan', 'Unit 1 · 170.5 kg · Per Shipment', 2750]
+      ]]
+    ],
+    contact: ['Gift Osaremen', 'gifto@oneport365.com'] }
+];
+
+/* Accepted quotes already booked as shipments */
+var BOOKED = { 'Q-26-10-019': 'SH-1046' };
+
+/* ---------- shipments ---------- */
+var STAGES = {
+  freight: ['Booking confirmed', 'Cargo received', 'In transit', 'Arrived at destination', 'Delivered'],
+  customs: ['Documents received', 'Customs examination', 'Duty assessed & paid', 'Cargo released', 'Delivered']
+};
+var SHORT = {
+  freight: ['Booked', 'Cargo received', 'In transit', 'Arrived', 'Delivered'],
+  customs: ['Documents received', 'Examination', 'Duty paid', 'Released', 'Delivered']
+};
+var SHIPMENTS = [
+  { id: 'SH-1052', stage: 3, svc: 'ocean', service: 'Ocean Freight FCL', from: 'Ningbo, China', to: 'Apapa, Lagos', load: '40FT × 1', cargo: 'Solar panels & inverters',
+    facts: [['Vessel', 'MV Atlantic Meridian'], ['Container', 'OPXU 482193-7']], eta: '18 Nov 2026',
+    update: 'On the water and on schedule. Last position reported 8 Nov.',
+    ms: [['2 Oct', 'Space confirmed'], ['9 Oct', 'Ningbo terminal'], ['13 Oct', 'Departed Ningbo'], ['18 Nov', 'Apapa Port'], ['24 Nov', 'Your Ikeja warehouse']] },
+  { id: 'SH-1049', stage: 2, svc: 'customs', service: 'Customs Brokerage FCL', from: 'Tin Can Island, Lagos', to: 'Agbara, Ogun', load: '40FT × 2', cargo: 'Industrial machinery',
+    facts: [['Terminal', 'TICT, Tin Can Island'], ['Form M', 'MF2026-0048213']], eta: '14 Nov 2026',
+    update: 'Customs examination booked for 11 Nov. Nothing needed from you.',
+    ms: [['4 Nov', 'Form M, BL and invoice'], ['11 Nov', 'Joint examination at TICT'], ['—', 'NCS assessment'], ['—', 'Release & exit note'], ['—', 'Agbara, Ogun']] },
+  { id: 'SH-1051', stage: 1, svc: 'ocean', service: 'Ocean Freight FCL', from: 'Mersin, Türkiye', to: 'Tin Can, Lagos', load: '20FT × 2', cargo: 'Ceramic floor tiles',
+    facts: [['Vessel', 'MV Levant Trader'], ['Container', 'Assigned at pickup']], eta: '09 Dec 2026',
+    update: 'Space confirmed. Pickup from your supplier is set for 12 Nov.',
+    ms: [['6 Nov', 'Space confirmed'], ['12 Nov', 'Supplier, Mersin'], ['15 Nov', 'Departs Mersin'], ['09 Dec', 'Tin Can Island'], ['15 Dec', 'Agbara, Ogun']] },
+  { id: 'SH-1046', stage: 5, svc: 'air', service: 'Air Freight', from: 'Berlin, Germany', to: 'Lagos, Nigeria', load: '170.5 kg', cargo: 'Laboratory supplies',
+    facts: [['Flight', 'Departed 15 Oct'], ['Air waybill', '020-48213390'], ['Quote', 'Q-26-10-019']], eta: '17 Oct 2026', update: '',
+    ms: [['13 Oct', 'Quote Q-26-10-019 accepted'], ['14 Oct', 'Berlin warehouse'], ['15 Oct', 'Departed BER'], ['16 Oct', 'Lagos airport (LOS)'], ['17 Oct', 'Victoria Island, Lagos']] },
+  { id: 'SH-1038', stage: 5, svc: 'ocean', service: 'Ocean Freight FCL', from: 'Yantian, China', to: 'Apapa, Lagos', load: '40FT × 1', cargo: 'Office furniture',
+    facts: [['Vessel', 'MV Coral Horizon'], ['Container', 'OPXU 219904-1']], eta: '21 Oct 2026', update: '',
+    ms: [['28 Aug', 'Space confirmed'], ['3 Sep', 'Yantian terminal'], ['6 Sep', 'Departed Yantian'], ['12 Oct', 'Apapa Port'], ['21 Oct', 'Ikeja warehouse']] }
+];
+
+/* ---------- account ---------- */
+var DOC_TYPES = ['Commercial invoice', 'Packing list', 'Form M', 'Bill of lading', 'Certificate of origin', 'SONCAP certificate', 'Other'];
+/* need: documents OnePort is waiting for from the customer; files: documents on the shipment */
+var DOCS = {
+  'SH-1052': { need: ['SONCAP certificate'], files: [
+    ['Bill of lading', 'BL-OPXU4821937.pdf', 'OnePort', '14 Oct'], ['Commercial invoice', 'Invoice_KIL-2210.pdf', 'You', '3 Oct'], ['Packing list', 'Packing_list_KIL-2210.pdf', 'You', '3 Oct'] ] },
+  'SH-1049': { need: [], files: [
+    ['Examination booking', 'TICT_exam_11Nov.pdf', 'OnePort', '8 Nov'], ['Form M', 'FormM_MF2026-0048213.pdf', 'You', '4 Nov'], ['Bill of lading', 'BL-MSCU-77120.pdf', 'You', '4 Nov'], ['Commercial invoice', 'Invoice_KIL-2187.pdf', 'You', '4 Nov'] ] },
+  'SH-1051': { need: ['Commercial invoice', 'Packing list'], files: [
+    ['Booking confirmation', 'Booking_SH-1051.pdf', 'OnePort', '6 Nov'] ] },
+  'SH-1046': { need: [], files: [
+    ['Proof of delivery', 'POD_SH-1046.pdf', 'OnePort', '17 Oct'], ['Air waybill', 'AWB_020-48213390.pdf', 'OnePort', '15 Oct'], ['Commercial invoice', 'Invoice_KIL-2154.pdf', 'You', '13 Oct'] ] },
+  'SH-1038': { need: [], files: [
+    ['Proof of delivery', 'POD_SH-1038.pdf', 'OnePort', '21 Oct'], ['Bill of lading', 'BL-OPXU2199041.pdf', 'OnePort', '8 Sep'] ] }
+};
+
+/* ---------- account ---------- */
+var COMPANY0 = { name: 'Kola Imports Ltd', initials: 'KI', email: 'trade@kolaimports.ng', industry: 'Consumer goods', tier: 'SME', owner: 'Gift Osaremen', address: '14 Oba Akran Avenue, Ikeja, Lagos' };
+var CONTACT0 = { name: 'Tunde Adebayo', title: 'Logistics Manager', email: 'tunde@kolaimports.ng', phone: '+2348030000000' };
+var ADDRESSES = [
+  ['Ikeja warehouse', '14 Oba Akran Avenue, Ikeja, Lagos', 'Default delivery'],
+  ['Agbara factory', 'Plot 7, Agbara Industrial Estate, Ogun', ''],
+  ['Head office', '3 Adeola Odeku Street, Victoria Island, Lagos', 'Billing']
+];
+var NOTIF = [
+  ['quotes', 'New quotes', 'When a quote is shared with you'],
+  ['expiry', 'Quote expiry reminders', '48 hours before a quote expires'],
+  ['milestones', 'Shipment milestones', 'Departures, arrivals and delivery'],
+  ['customs', 'Customs updates', 'Examination, duty and release'],
+  ['email', 'Email copies', 'Also send updates by email']
+];
+var FAQ = [
+  ['How long is a quote valid?', 'Each quote shows its validity date. Most offers are firm for acceptance within 48 hours of being shared, after which rates may change.'],
+  ['What happens after I accept a quote?', 'Your quote becomes a shipment straight away. Your sales contact will confirm booking details and the shipment appears under Shipments.'],
+  ['Are duties and VAT included?', 'No. Duty and tax are assessed by NCS on arrival, and 7.5% VAT is applied at the time of invoicing.'],
+  ['Can I change a rejected quote?', 'Contact your account manager and we will send a revised quote.']
+];
+
+/* ---------- helpers ---------- */
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function money(n) { return '₦' + (Math.round(n * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function subtotal(sec) { return sec[1].reduce(function (a, l) { return a + l[2]; }, 0); }
+function total(q) { return q.sections.reduce(function (a, s) { return a + subtotal(s); }, 0); }
+function find(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
+function loadOf(q) { for (var i = 0; i < q.details.length; i++) if (/Container|weight/.test(q.details[i][0])) return q.details[i][1]; return ''; }
+function svg(d, size, color, sw) { return '<svg width="' + size + '" height="' + size + '" fill="none" stroke="' + color + '" stroke-width="' + (sw || 2) + '" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">' + d + '</svg>'; }
+var P = {
+  check: '<path d="M20 6L9 17l-5-5"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>', back: '<path d="M15 5l-7 7 7 7"/>',
+  down: '<path d="M6 9l6 6 6-6"/>', chev: '<path d="M9 18l6-6-6-6"/>', home: '<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>',
+  bell: '<path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+  doc: '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/>',
+  box: '<path d="M3 8l9-5 9 5v8l-9 5-9-5z M3 8l9 5 9-5M12 13v8"/>', user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  chat: '<path d="M4 5h16v11H9l-5 4z"/>',
+  ship: '<path d="M3 15l2 5h14l2-5zM6 15V9h12v6M12 4v5"/>',
+  plane: '<path d="M2.5 12.5L9 13l4.5 7h2L14 13l5.5-.3c1.2 0 2-.8 2-1.7s-.8-1.7-2-1.7L14 9l1.5-7h-2L9 9l-6.5.5z"/>',
+  stamp: '<path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
+  building: '<path d="M4 21V5l8-2v18M12 9h8v12M8 8h.01M8 12h.01M8 16h.01M16 13h.01M16 17h.01M2 21h20"/>',
+  pin: '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/>',
+  out: '<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/>',
+  phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
+  upload: '<path d="M12 16V4M7 9l5-5 5 5M5 20h14"/>',
+  dl: '<path d="M12 4v12M7 11l5 5 5-5M5 20h14"/>',
+  pencil: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>'
+};
+function svcIcon(svc, size, color) { return svg(P[SERVICE_ICON[svc]], size, color, 2); }
+function chip(st) { return '<span class="chip dot st-' + st + '">' + STATUS[st] + '</span>'; }
+function kind(s) { return s.svc === 'customs' ? 'customs' : 'freight'; }
+function shipChip(s) {
+  var c = s.stage === 5 ? 'background:#E1F1E8;color:#0f7a45' : s.stage >= 3 ? 'background:#D1DBBD;color:#023819' : 'background:#EDEFE8;color:#4a5a3f';
+  return '<span class="chip" style="' + c + '">' + SHORT[kind(s)][s.stage - 1] + '</span>';
+}
+
+/* ---------- state ---------- */
+var S, app = document.getElementById('app'), lastSheet = null, memo = {};
+function fresh() {
+  var s = { tab: 'home', view: null, from: null, sel: QUOTES[0].id, shipId: null, page: null, sheet: null,
+    st: {}, dec: {}, reason: '', err: false, qFilter: 'all', sFilter: 'active', newShips: [], prefs: {},
+    docs: {}, up: null, company: Object.assign({}, COMPANY0), contact: Object.assign({}, CONTACT0), ferr: {} };
+  Object.keys(DOCS).forEach(function (k) { s.docs[k] = { need: DOCS[k].need.slice(), files: DOCS[k].files.map(function (f) { return { type: f[0], file: f[1], from: f[2], date: f[3], review: false }; }) }; });
+  QUOTES.forEach(function (q) { s.st[q.id] = q.status; if (q.decided) s.dec[q.id] = { on: q.decided, reason: q.reason || '', ship: BOOKED[q.id] || null }; });
+  NOTIF.forEach(function (n) { s.prefs[n[0]] = n[0] !== 'email'; });
+  return s;
+}
+S = fresh();
+function ships() { return S.newShips.concat(SHIPMENTS); }
+function pendingCount() { return QUOTES.filter(function (q) { return S.st[q.id] === 'pending'; }).length; }
+
+/* ================= TAB: HOME ================= */
+function homeTab() {
+  var all = ships(), active = all.filter(function (x) { return x.stage < 5; });
+  var pend = QUOTES.filter(function (q) { return S.st[q.id] === 'pending'; });
+  var docTasks = [];
+  all.forEach(function (sh) { var d = S.docs[sh.id]; if (d) d.need.forEach(function (t) { docTasks.push([sh, t]); }); });
+  var tasks = pend.map(function (q) {
+    return '<button type="button" class="mrow" data-act="openQuote" data-v="' + q.id + '"><span class="mi" style="background:#FFF3CC">' + svg(P.doc, 18, '#7a5d00', 1.9) + '</span>' +
+      '<span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:600">Review quote ' + q.id + '</span><span class="muted" style="display:block;font-size:12.5px;font-weight:400">' + q.service + ' · Valid until ' + q.validUntil.replace(/ 2026$/, '') + '</span></span>' + svg(P.chev, 16, '#5f665b', 2) + '</button>';
+  }).concat(docTasks.map(function (x) {
+    return '<button type="button" class="mrow" data-act="openShip" data-v="' + x[0].id + '"><span class="mi" style="background:#FFF3CC">' + svg(P.upload, 18, '#7a5d00', 1.9) + '</span>' +
+      '<span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:600">Upload ' + x[1] + '</span><span class="muted" style="display:block;font-size:12.5px;font-weight:400">For shipment ' + x[0].id + ' · ' + esc(x[0].from.split(',')[0]) + ' → ' + esc(x[0].to.split(',')[0]) + '</span></span>' + svg(P.chev, 16, '#5f665b', 2) + '</button>';
+  }));
+  var hour = 'Good afternoon';
+  var h = '<div class="head"><span class="wordmark">OnePort <b>365</b></span><button class="icon-btn" type="button" aria-label="Notifications" data-act="toast" data-v="You’re all caught up">' + svg(P.bell, 22, '#023819', 1.9) + '</button></div>' +
+    '<div class="scroll" data-scroll><div style="padding:4px 20px 24px;display:flex;flex-direction:column;gap:24px">' +
+    '<div><h1 class="disp" style="font-weight:600;font-size:26px;color:#023819;margin:0">' + hour + ', ' + esc(S.contact.name.split(' ')[0]) + '</h1><p class="muted" style="margin:4px 0 0;font-size:14px">Here’s where your freight stands today.</p></div>' +
+    '<div class="stats">' +
+      '<button type="button" class="stat' + (pend.length ? ' hot' : '') + '" data-act="goTab" data-v="quotes" data-f="pending"><b>' + pend.length + '</b><span>Quotes to review</span></button>' +
+      '<button type="button" class="stat" data-act="goTab" data-v="shipments" data-f="active"><b>' + active.length + '</b><span>Active shipments</span></button>' +
+      '<button type="button" class="stat" data-act="goTab" data-v="shipments" data-f="active"><b>' + docTasks.length + '</b><span>Documents needed</span></button>' +
+    '</div>' +
+    '<section><div class="sechead"><h2>Needs your attention</h2></div>' +
+      (tasks.length ? '<div class="menu">' + tasks.join('') + '</div>' : '<div class="card muted" style="padding:18px;text-align:center;font-size:14px">You’re all caught up.</div>') + '</section>' +
+    '<section><div class="sechead"><h2>Active shipments</h2><button type="button" class="link" data-act="goTab" data-v="shipments" data-f="active">See all</button></div><div style="display:flex;flex-direction:column;gap:10px">' +
+      active.slice(0, 3).map(function (sh) {
+        return '<button type="button" class="tapcard" data-act="openShip" data-v="' + sh.id + '"><div style="display:flex;align-items:center;gap:12px"><span class="svc">' + svcIcon(sh.svc, 18, '#023819') + '</span>' +
+          '<div style="flex:1;min-width:0"><div style="font-size:14.5px;font-weight:600;color:#023819">' + esc(sh.from.split(',')[0]) + ' → ' + esc(sh.to.split(',')[0]) + '</div><div class="muted" style="font-size:12.5px">' + sh.id + ' · ' + sh.service + '</div></div>' + shipChip(sh) + '</div>' +
+          '<span class="prog" aria-hidden="true"><i style="width:' + (sh.stage * 20) + '%"></i></span></button>';
+      }).join('') + '</div></section>' +
+    '</div></div>';
+  return h;
+}
+
+/* ================= TAB: QUOTES ================= */
+function quotesTab() {
+  var shown = QUOTES.filter(function (q) { return S.qFilter === 'all' || S.st[q.id] === S.qFilter; });
+  var h = '<div class="head"><h1>Quotes</h1><button class="icon-btn" type="button" aria-label="Notifications" data-act="toast" data-v="You’re all caught up">' + svg(P.bell, 22, '#023819', 1.9) + '</button></div>' +
+    filters([['all', 'All'], ['pending', 'Pending'], ['accepted', 'Accepted'], ['rejected', 'Rejected']], S.qFilter, 'qFilter') +
+    '<div class="scroll" data-scroll><div class="list">';
+  shown.forEach(function (q) {
+    var st = S.st[q.id];
+    h += '<button type="button" class="tapcard" data-act="openQuote" data-v="' + q.id + '" aria-label="' + esc(q.service + ', ' + q.id + ', ' + q.from + ' to ' + q.to + ', ' + STATUS[st] + ', ' + money(total(q))) + '">' +
+      '<div style="display:flex;align-items:center;gap:12px"><span class="svc">' + svcIcon(q.svc, 18, '#023819') + '</span>' +
+      '<div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;color:#023819">' + q.service + '</div><div class="muted" style="font-size:12.5px">' + q.id + ' · ' + q.date + '</div></div></div>' +
+      '<div style="font-size:14px;margin-top:4px">' + esc(q.from) + ' <span class="muted">→</span> ' + esc(q.to) + '</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">' + chip(st) + '<span class="disp" style="font-weight:600;font-size:15px;color:#023819">' + money(total(q)) + '</span></div></button>';
+  });
+  if (!shown.length) h += '<p class="muted" style="text-align:center;padding:40px 0;font-size:14px">No quotes here yet.</p>';
+  return h + '</div></div>';
+}
+
+function quoteDetail() {
+  var q = find(QUOTES, S.sel), st = S.st[q.id], d = S.dec[q.id], t = total(q);
+  var h = '<section class="screen" aria-label="Quote details">' + backBar(q.id) +
+    '<div class="scroll" data-scroll><div style="padding:4px 20px 24px;display:flex;flex-direction:column;gap:20px">';
+  h += '<div style="display:flex;flex-direction:column;gap:10px">' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#023819"><span class="svc" style="width:30px;height:30px;border-radius:8px">' + svcIcon(q.svc, 16, '#023819') + '</span>' + q.service + '</span>' + chip(st) + '</div>' +
+    '<h1 class="disp" style="font-weight:600;font-size:24px;line-height:1.25;color:#023819;margin:4px 0 0">' + esc(q.from) + ' → ' + esc(q.to) + '</h1>' +
+    '<div class="card" style="padding:16px;margin-top:6px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px">' +
+    '<div><div style="font-size:13px" class="muted">Grand total (NGN)</div><div class="disp" style="font-weight:700;font-size:28px;color:#023819;line-height:1.2">' + money(t) + '</div></div>' +
+    '<div style="text-align:right;font-size:13px;flex-shrink:0"><div class="muted">Valid until</div><div style="font-weight:600;color:#023819">' + q.validUntil + '</div></div></div></div>';
+  if (st === 'accepted') h += '<p class="banner" role="status" style="background:#E1F1E8;color:#0b5a33">You accepted this quote on ' + d.on + (d.ship ? ' and it was booked as shipment <b>' + d.ship + '</b>.' : '.') + ' Our team will contact you regarding the next steps.</p>';
+  if (st === 'rejected') h += '<p class="banner" role="status" style="background:#EDEFE8;color:#023819">You rejected this quote on ' + d.on + '.<br><span class="muted">Reason: “' + esc(d.reason) + '”</span></p>';
+  h += '<section><h2 class="sec">Shipment details</h2><div class="card" style="padding:2px 16px">' +
+    q.details.map(function (r) { return '<div class="row"><span>' + r[0] + '</span><span>' + esc(r[1]) + '</span></div>'; }).join('') + '</div></section>';
+  h += '<section><h2 class="sec">Cost breakdown</h2><div style="display:flex;flex-direction:column;gap:10px">' +
+    q.sections.map(function (sec) {
+      return '<div class="card" style="overflow:hidden"><div class="grp">' + sec[0] + '</div><div style="padding:0 16px">' +
+        sec[1].map(function (l) {
+          return '<div class="line"><div style="min-width:0"><div style="font-size:14px;font-weight:500;color:#023819">' + esc(l[0]) + '</div><div class="muted" style="font-size:12px;margin-top:2px">' + esc(l[1]) + '</div></div><div class="amt">' + money(l[2]) + '</div></div>';
+        }).join('') + '<div class="subt"><span>Sub total</span><b>' + money(subtotal(sec)) + '</b></div></div></div>';
+    }).join('') + '<div class="grand"><span>Grand total</span><b class="disp">' + money(t) + ' NGN</b></div></div></section>';
+  h += '<p class="notice"><b>Important notice.</b> ' + esc(NOTICE) + '</p>';
+  h += '<div><details><summary>Terms &amp; conditions' + svg(P.down, 18, '#023819', 2) + '</summary><ol class="terms">' + TERMS.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol></details>' +
+    '<details><summary>Your sales contact' + svg(P.down, 18, '#023819', 2) + '</summary><p style="margin:0 0 14px;font-size:13.5px;line-height:1.6" class="muted"><b style="color:#023819">' + esc(q.contact[0]) + '</b><br>' + esc(q.contact[1]) + '</p></details></div>';
+  h += '</div></div>';
+  if (st === 'pending') h += '<div class="actions"><button type="button" class="btn btn-outline" data-act="openReject">Reject Quote</button><button type="button" class="btn btn-accent" data-act="openAccept">Accept Quote</button></div>';
+  if (st === 'accepted' && d.ship) h += '<div class="actions one"><button type="button" class="btn btn-solid" data-act="openShip" data-v="' + d.ship + '">Track shipment ' + d.ship + '</button></div>';
+  return h + '</section>';
+}
+
+function acceptSheet() {
+  var q = find(QUOTES, S.sel);
+  return '<div class="overlay' + (lastSheet !== 'accept' ? ' anim' : '') + '"><button class="scrim" type="button" aria-label="Cancel" data-act="close"></button>' +
+    '<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="acc-t"><span class="handle"></span>' +
+    '<div><h2 id="acc-t" class="disp" style="font-weight:600;font-size:22px;color:#023819;margin:4px 0 8px">Accept this quote?</h2>' +
+    '<p style="margin:0;font-size:15px;line-height:1.55">Are you sure you want to accept this quote for <b style="color:#023819">' + money(total(q)) + '</b>? We’ll book it as a shipment you can track.</p></div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px"><button type="button" class="btn btn-accent" data-act="confirmAccept">Yes, accept quote</button>' +
+    '<button type="button" class="btn btn-text" data-act="close">Cancel</button></div></div></div>';
+}
+function rejectSheet() {
+  return '<div class="overlay' + (lastSheet !== 'reject' ? ' anim' : '') + '"><button class="scrim" type="button" aria-label="Cancel" data-act="close"></button>' +
+    '<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="rej-t"><span class="handle"></span>' +
+    '<div><h2 id="rej-t" class="disp" style="font-weight:600;font-size:22px;color:#023819;margin:4px 0 8px">Reject this quote?</h2>' +
+    '<p style="margin:0;font-size:15px;line-height:1.55">Let us know why, so we can improve our offer.</p></div>' +
+    '<div style="margin-top:6px"><label class="field" id="field"><span class="flabel">Reason for rejection</span>' +
+    '<textarea id="reason" rows="4" maxlength="500" aria-required="true" aria-describedby="helper" placeholder="Please tell us why you are rejecting this quote">' + esc(S.reason) + '</textarea></label>' +
+    '<div id="helper" style="font-size:12.5px;margin-top:6px;min-height:18px;color:#cc1414;font-weight:500"></div></div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px"><button type="button" class="btn" id="submit" data-act="submitReject">Submit Rejection</button>' +
+    '<button type="button" class="btn btn-text" data-act="close">Cancel</button></div></div></div>';
+}
+function syncReject() {
+  var f = document.getElementById('field'); if (!f) return;
+  var filled = S.reason.trim().length > 0;
+  f.className = 'field' + (filled ? ' filled' : '') + (S.err ? ' error' : '');
+  document.getElementById('reason').setAttribute('aria-invalid', S.err ? 'true' : 'false');
+  document.getElementById('helper').textContent = S.err ? 'Please enter a reason before submitting.' : '';
+  var b = document.getElementById('submit');
+  b.className = 'btn ' + (filled ? 'btn-solid' : 'btn-disabled');
+  b.setAttribute('aria-disabled', filled ? 'false' : 'true');
+}
+
+function doneScreen(kindOf) {
+  var q = find(QUOTES, S.sel), ok = kindOf === 'accepted', d = S.dec[q.id];
+  var icon = ok ? '<span class="done-ic" style="background:#BFFB4F">' + svg(P.check, 38, '#023819', 2.8) + '</span>'
+                : '<span class="done-ic" style="background:#023819">' + svg(P.chat, 34, '#BFFB4F', 2.2) + '</span>';
+  var title = ok ? 'Quote accepted' : 'Rejection submitted';
+  var msg = ok ? 'Your quote has been accepted. Our team will contact you regarding the next steps.'
+               : 'Thank you. We’ve received your rejection and feedback. Our team will review it and may follow up with a revised quote.';
+  var meta = ok ? q.id + ' · Booked as shipment ' + d.ship : q.id + ' · Rejected';
+  var btns = ok ? '<button type="button" class="btn btn-solid" data-act="openShip" data-v="' + d.ship + '">Track shipment</button><button type="button" class="btn btn-text" data-act="goTab" data-v="quotes">Back to quotes</button>'
+                : '<button type="button" class="btn btn-solid" data-act="goTab" data-v="quotes">Back to quotes</button><button type="button" class="btn btn-text" data-act="openQuote" data-v="' + q.id + '">View quote</button>';
+  return '<section class="screen" aria-label="' + title + '"><div class="done" role="status">' + icon +
+    '<h1 class="disp" style="font-weight:600;font-size:26px;color:#023819;margin:8px 0 0">' + title + '</h1>' +
+    '<p style="margin:0;font-size:15px;line-height:1.6;max-width:300px">' + msg + '</p>' +
+    '<p class="muted" style="margin:4px 0 0;font-size:13px">' + meta + '</p></div><div class="foot">' + btns + '</div></section>';
+}
+
+/* ================= TAB: SHIPMENTS ================= */
+function shipmentsTab() {
+  var all = ships();
+  var list = S.sFilter === 'active' ? all.filter(function (x) { return x.stage < 5; }) : S.sFilter === 'completed' ? all.filter(function (x) { return x.stage === 5; }) : all;
+  var h = '<div class="head"><h1>Shipments</h1></div>' +
+    filters([['active', 'Active'], ['completed', 'Completed'], ['all', 'All']], S.sFilter, 'sFilter') +
+    '<div class="scroll" data-scroll><div class="list">';
+  list.forEach(function (s) {
+    var done = s.stage === 5;
+    var when = done ? 'Delivered ' + s.eta.replace(/ 2026$/, '') : (kind(s) === 'customs' ? 'Release by ' : 'ETA ') + s.eta.replace(/ 2026$/, '');
+    h += '<button type="button" class="tapcard" data-act="openShip" data-v="' + s.id + '" aria-label="' + esc(s.service + ', ' + s.id + ', ' + s.from + ' to ' + s.to + ', ' + SHORT[kind(s)][s.stage - 1]) + '">' +
+      '<div style="display:flex;align-items:center;gap:12px"><span class="svc">' + svcIcon(s.svc, 18, '#023819') + '</span>' +
+      '<div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;color:#023819">' + s.service + '</div><div class="muted" style="font-size:12.5px">' + s.id + ' · ' + esc(s.cargo) + '</div></div></div>' +
+      '<div style="font-size:14px;margin-top:4px">' + esc(s.from) + ' <span class="muted">→</span> ' + esc(s.to) + '</div>' +
+      (S.docs[s.id] && S.docs[s.id].need.length ? '<div style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:#7a5d00">' + svg(P.file, 14, '#7a5d00', 2) + S.docs[s.id].need.length + (S.docs[s.id].need.length === 1 ? ' document' : ' documents') + ' needed from you</div>' : '') +
+      '<span class="prog' + (done ? ' done' : '') + '" role="progressbar" aria-valuemin="0" aria-valuemax="5" aria-valuenow="' + s.stage + '" aria-label="Progress"><i style="width:' + (s.stage * 20) + '%"></i></span>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">' + shipChip(s) + '<span style="font-size:13px;font-weight:600;color:#023819">' + when + '</span></div></button>';
+  });
+  if (!list.length) h += '<p class="muted" style="text-align:center;padding:40px 0;font-size:14px">No shipments here yet.</p>';
+  return h + '</div></div>';
+}
+
+function shipDetail() {
+  var s = find(ships(), S.shipId), k = kind(s), done = s.stage === 5;
+  var etaLabel = done ? 'Delivered' : k === 'customs' ? 'Expected release' : s.stage === 4 ? 'Delivery expected' : 'Estimated arrival';
+  var steps = STAGES[k].map(function (label, i) {
+    var n = i + 1, isDone = n < s.stage || done, cur = n === s.stage && !done;
+    return '<li class="' + (isDone ? 'is-done' : cur ? 'current' : '') + '"' + (cur ? ' aria-current="step"' : '') + '><div class="rail"><div class="node">' + (isDone ? svg(P.check, 12, '#BFFB4F', 3.2) : '') + '</div>' + (n < 5 ? '<div class="seg"' + (n < s.stage ? ' style="background:#023819"' : '') + '></div>' : '') + '</div>' +
+      '<div class="body"><div><div class="label">' + label + '</div><div class="muted" style="font-size:12.5px;margin-top:1px">' + esc(s.ms[i][1]) + '</div></div><div class="muted" style="font-size:12px;font-weight:600;white-space:nowrap;padding-top:2px">' + s.ms[i][0] + '</div></div></li>';
+  }).join('');
+  var facts = [['Service', s.service], [/kg/.test(s.load) ? 'Chargeable weight' : 'Container', s.load], ['Cargo', s.cargo]].concat(s.facts);
+  return '<section class="screen" aria-label="Shipment details">' + backBar(s.id) +
+    '<div class="scroll" data-scroll><div style="padding:4px 20px 24px;display:flex;flex-direction:column;gap:20px">' +
+    '<div style="display:flex;flex-direction:column;gap:10px">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#023819"><span class="svc" style="width:30px;height:30px;border-radius:8px">' + svcIcon(s.svc, 16, '#023819') + '</span>' + s.service + '</span>' + shipChip(s) + '</div>' +
+      '<h1 class="disp" style="font-weight:600;font-size:24px;line-height:1.25;color:#023819;margin:4px 0 0">' + esc(s.from) + ' → ' + esc(s.to) + '</h1>' +
+      '<div class="card" style="padding:16px;margin-top:6px"><div style="font-size:13px" class="muted">' + etaLabel + '</div><div class="disp" style="font-weight:700;font-size:24px;color:#023819;line-height:1.25">' + s.eta + '</div>' +
+      (s.update ? '<p class="update">' + esc(s.update) + '</p>' : '') + '</div></div>' +
+    '<section><h2 class="sec">Progress</h2><div class="card" style="padding:16px"><ol class="tl">' + steps + '</ol></div></section>' +
+    docsSection(s) +
+    '<section><h2 class="sec">Details</h2><div class="card" style="padding:2px 16px">' + facts.map(function (f) { return '<div class="row"><span>' + f[0] + '</span><span>' + esc(f[1]) + '</span></div>'; }).join('') + '</div></section>' +
+    '<button type="button" class="btn btn-outline" data-act="toast" data-v="Opening chat with Gift, your account manager">' + svg(P.chat, 18, '#023819', 2) + '<span style="margin-left:8px">Contact your account manager</span></button>' +
+    '</div></div></section>';
+}
+
+function docsSection(s) {
+  var d = S.docs[s.id] || { need: [], files: [] };
+  var h = '<section aria-labelledby="docs-h"><div style="display:flex;justify-content:space-between;align-items:baseline"><h2 class="sec" id="docs-h">Documents</h2><span class="muted" style="font-size:12.5px">' + d.files.length + ' on file</span></div><div class="card" style="padding:4px 16px 16px">';
+  if (d.need.length) {
+    h += '<div class="subhead" style="color:#7a5d00">Needed from you</div>' + d.need.map(function (t) {
+      return '<div class="doc"><span class="fi need">' + svg(P.file, 18, '#7a5d00', 1.9) + '</span><div style="flex:1;min-width:0"><div class="dn">' + t + '</div><div class="dm">Requested by OnePort</div></div>' +
+        '<button type="button" class="btn btn-accent btn-sm" data-act="openUpload" data-v="' + t + '">' + svg(P.upload, 16, '#023819', 2.2) + 'Upload</button></div>';
+    }).join('');
+  }
+  if (d.files.length) {
+    h += '<div class="subhead">Shared documents</div>' + d.files.map(function (f, i) {
+      var meta = esc(f.file) + ' · ' + (f.from === 'You' ? 'Sent by you' : 'From OnePort') + ' · ' + f.date;
+      var right = f.review ? '<span class="chip" style="background:#FFF3CC;color:#7a5d00">Under review</span>'
+        : '<button type="button" class="icon-btn" aria-label="Download ' + esc(f.type) + '" data-act="toast" data-v="Downloading ' + esc(f.file) + '">' + svg(P.dl, 19, '#023819', 2) + '</button>';
+      return '<div class="doc"><span class="fi">' + svg(P.file, 18, '#023819', 1.9) + '</span><div style="flex:1;min-width:0"><div class="dn">' + esc(f.type) + '</div><div class="dm">' + meta + '</div></div>' + right + '</div>';
+    }).join('');
+  }
+  h += '<button type="button" class="btn btn-outline" style="margin-top:12px;height:48px" data-act="openUpload">' + svg(P.upload, 18, '#023819', 2) + '<span style="margin-left:8px">Send a document</span></button>';
+  return h + '</div></section>';
+}
+
+function uploadSheet() {
+  var u = S.up, s = find(ships(), S.shipId), ready = u.type && u.file;
+  return '<div class="overlay' + (lastSheet !== 'upload' ? ' anim' : '') + '"><button class="scrim" type="button" aria-label="Cancel" data-act="close"></button>' +
+    '<div class="sheet tall" role="dialog" aria-modal="true" aria-labelledby="up-t"><span class="handle"></span>' +
+    '<div><h2 id="up-t" class="disp" style="font-weight:600;font-size:22px;color:#023819;margin:4px 0 6px">Send a document</h2>' +
+    '<p class="muted" style="margin:0;font-size:14px;line-height:1.5">For shipment ' + s.id + '. Our team reviews documents within 1 business day.</p></div>' +
+    '<div><div class="k" style="margin-bottom:8px">Document type</div><div style="display:flex;flex-wrap:wrap;gap:8px" role="radiogroup" aria-label="Document type">' +
+      DOC_TYPES.map(function (t) { var on = u.type === t; return '<button type="button" role="radio" aria-checked="' + on + '" class="rchip' + (on ? ' on' : '') + '" data-act="upType" data-v="' + t + '">' + t + '</button>'; }).join('') + '</div></div>' +
+    '<div><div class="k" style="margin-bottom:8px">File</div>' +
+      '<button type="button" class="dropzone' + (u.file ? ' has' : '') + '" data-act="pickFile">' +
+      '<span class="svc" style="background:' + (u.file ? '#BFFB4F' : '#EDEFE8') + '">' + svg(u.file ? P.file : P.upload, 18, '#023819', 2) + '</span>' +
+      (u.file ? '<span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:600;color:#023819;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(u.file.name) + '</span><span class="muted" style="font-size:12.5px">' + u.file.size + ' · Tap to change</span></span>'
+              : '<span style="flex:1"><span style="display:block;font-size:14px;font-weight:600;color:#023819">Choose a file</span><span class="muted" style="font-size:12.5px">PDF, image, Word or Excel · up to 10 MB</span></span>') +
+      '</button></div>' +
+    '<label class="field compact' + (u.note ? ' filled' : '') + '"><span class="flabel">Note for our team (optional)</span><textarea id="upnote" rows="2" maxlength="300" style="min-height:48px" placeholder="E.g. revised invoice with updated HS codes">' + esc(u.note) + '</textarea></label>' +
+    '<div style="display:flex;flex-direction:column;gap:8px"><button type="button" class="btn ' + (ready ? 'btn-solid' : 'btn-disabled') + '" aria-disabled="' + !ready + '" data-act="sendDoc">Send to OnePort</button>' +
+    '<button type="button" class="btn btn-text" data-act="close">Cancel</button></div>' +
+    (!ready && u.tried ? '<div class="ferr" style="text-align:center;margin-top:-4px">Choose a document type and a file to send.</div>' : '') +
+    '</div></div>';
+}
+
+/* ================= TAB: ACCOUNT ================= */
+var PAGES = {
+  notifications: ['Notification settings', P.bell], addresses: ['Saved addresses', P.pin], help: ['Help & support', P.help]
+};
+function initials(n) { return n.split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0].toUpperCase(); }).join(''); }
+function kv(label, value, full) { return '<div' + (full ? ' class="full"' : '') + '><div class="k">' + label + '</div><div class="v">' + value + '</div></div>'; }
+function accountTab() {
+  var c = S.company, p = S.contact, shipCount = ships().length;
+  return '<div class="head"><h1>Account</h1></div><div class="scroll" data-scroll><div style="padding:4px 20px 24px;display:flex;flex-direction:column;gap:16px">' +
+    '<section class="panel" aria-labelledby="co-h"><div class="panel-h"><h2 id="co-h">Company Details</h2><p>View company information</p></div>' +
+      '<div class="panel-b"><div class="ident"><span class="mono">' + initials(c.name) + '</span><div style="min-width:0"><div class="nm">' + esc(c.name) + '</div><div class="muted" style="font-size:13px">' + esc(c.email) + '</div></div></div>' +
+      '<div class="kgrid">' + kv('Industry', esc(c.industry)) +
+        kv('Class tier', '<span class="tier">' + esc(c.tier) + '</span>') +
+        kv('Account manager', '<span class="mono xs">' + initials(c.owner) + '</span>' + esc(c.owner)) + kv('Email', esc(c.email), true) +
+        kv('Total shipments', String(shipCount)) + kv('Address', esc(c.address), true) + '</div></div>' +
+      '<div class="panel-f"><button type="button" class="btn btn-accent btn-sm" data-act="openEdit" data-v="company">' + svg(P.pencil, 16, '#023819', 2) + 'Edit Company</button></div></section>' +
+    '<section class="panel" aria-labelledby="ct-h"><div class="panel-h"><h2 id="ct-h">Contact Details</h2><p>View contact information</p></div>' +
+      '<div class="panel-b"><div class="ident"><span class="mono round">' + initials(p.name) + '</span><div style="min-width:0"><div class="nm">' + esc(p.name) + '</div><div class="muted" style="font-size:13px">' + esc(p.title) + '</div></div></div>' +
+      '<div class="kgrid">' + kv('Company', svg(P.building, 15, '#5f665b', 1.9) + esc(c.name)) + kv('Title', esc(p.title)) +
+        kv('Phone', esc(p.phone)) + kv('Email', '<a href="mailto:' + esc(p.email) + '">' + esc(p.email) + '</a>', true) + '</div></div>' +
+      '<div class="panel-f"><button type="button" class="btn btn-accent btn-sm" data-act="openEdit" data-v="contact">' + svg(P.pencil, 16, '#023819', 2) + 'Edit Contact</button></div></section>' +
+    '<nav class="menu" aria-label="Account settings">' + Object.keys(PAGES).map(function (k) {
+      return '<button type="button" class="mrow" data-act="openPage" data-v="' + k + '"><span class="mi">' + svg(PAGES[k][1], 18, '#023819', 1.9) + '</span><span style="flex:1">' + PAGES[k][0] + '</span>' + svg(P.chev, 16, '#5f665b', 2) + '</button>';
+    }).join('') + '</nav>' +
+    '<button type="button" class="btn btn-outline" data-act="signOut">' + svg(P.out, 18, '#023819', 2) + '<span style="margin-left:8px">Sign out</span></button>' +
+    '<p class="muted" style="text-align:center;font-size:12px;margin:4px 0 0">OnePort 365 · version 1.0 (prototype)</p>' +
+    '</div></div>';
+}
+
+var EDIT = {
+  company: { title: 'Edit Company', sub: 'Update your company information', fields: [['name', 'Company name', true], ['email', 'Company email', true], ['industry', 'Industry', false], ['address', 'Address', false]] },
+  contact: { title: 'Edit Contact', sub: 'Update your contact information', fields: [['name', 'Full name', true], ['title', 'Job title', false], ['email', 'Email', true], ['phone', 'Phone', false]] }
+};
+function editSheet(which) {
+  var e = EDIT[which], data = S[which];
+  return '<div class="overlay' + (lastSheet !== S.sheet ? ' anim' : '') + '"><button class="scrim" type="button" aria-label="Cancel" data-act="close"></button>' +
+    '<form class="sheet tall" role="dialog" aria-modal="true" aria-labelledby="ed-t" data-form="' + which + '" novalidate><span class="handle"></span>' +
+    '<div><h2 id="ed-t" class="disp" style="font-weight:600;font-size:22px;color:#023819;margin:4px 0 4px">' + e.title + '</h2><p class="muted" style="margin:0;font-size:14px">' + e.sub + '</p></div>' +
+    e.fields.map(function (f) {
+      var err = S.ferr[f[0]];
+      return '<div><label class="field compact filled' + (err ? ' error' : '') + '"><span class="flabel">' + f[1] + (f[2] ? ' *' : '') + '</span>' +
+        '<input class="inp" id="ed-' + f[0] + '" value="' + esc(data[f[0]]) + '"' + (f[0] === 'email' ? ' type="email"' : f[0] === 'phone' ? ' type="tel"' : '') + (f[2] ? ' aria-required="true"' : '') + (err ? ' aria-invalid="true"' : '') + '></label>' +
+        (err ? '<div class="ferr">' + err + '</div>' : '') + '</div>';
+    }).join('') +
+    '<div style="display:flex;gap:10px;margin-top:4px"><button type="button" class="btn btn-outline" style="flex:1" data-act="close">Cancel</button><button type="submit" class="btn btn-accent" style="flex:1.4">Save changes</button></div>' +
+    '</form></div>';
+}
+
+function accountPage() {
+  var k = S.page, body = '';
+  if (k === 'notifications') {
+    body = '<div class="menu">' + NOTIF.map(function (n) {
+      return '<div class="mrow" style="cursor:default"><span style="flex:1;min-width:0"><span id="lb-' + n[0] + '" style="display:block;font-size:15px">' + n[1] + '</span><span class="muted" style="display:block;font-size:12.5px;font-weight:400;margin-top:2px">' + esc(n[2]) + '</span></span>' +
+        '<button type="button" class="switch" role="switch" aria-labelledby="lb-' + n[0] + '" aria-checked="' + !!S.prefs[n[0]] + '" data-act="pref" data-v="' + n[0] + '"></button></div>';
+    }).join('') + '</div>';
+  } else if (k === 'addresses') {
+    body = '<div class="menu">' + ADDRESSES.map(function (a) {
+      return '<div class="mrow" style="cursor:default;align-items:flex-start"><span class="mi">' + svg(P.pin, 18, '#023819', 1.9) + '</span><span style="flex:1;min-width:0"><span style="display:block;font-size:15px">' + a[0] + '</span><span class="muted" style="display:block;font-size:13px;font-weight:400;margin-top:2px;line-height:1.45">' + esc(a[1]) + '</span>' +
+        (a[2] ? '<span class="chip" style="background:#EDEFE8;color:#4a5a3f;margin-top:8px">' + a[2] + '</span>' : '') + '</span></div>';
+    }).join('') + '</div>' +
+      '<button type="button" class="btn btn-outline" data-act="toast" data-v="Add address isn’t part of this prototype">' + svg(P.plus, 18, '#023819', 2) + '<span style="margin-left:8px">Add address</span></button>';
+  } else if (k === 'help') {
+    body = '<div class="card" style="padding:16px;display:flex;align-items:center;gap:12px"><span class="avatar" style="width:44px;height:44px;border-radius:50%;font-size:15px">GO</span>' +
+      '<div style="flex:1;min-width:0"><div class="muted" style="font-size:12.5px">Your account manager</div><div style="font-weight:600;color:#023819">Gift Osaremen</div><div class="muted" style="font-size:12.5px">gifto@oneport365.com</div></div>' +
+      '<button type="button" class="icon-btn" style="background:#023819" aria-label="Call Gift Osaremen" data-act="toast" data-v="Calling Gift Osaremen…">' + svg(P.phone, 19, '#BFFB4F', 2) + '</button></div>' +
+      '<h2 class="sec" style="margin:8px 0 0">Common questions</h2><div>' + FAQ.map(function (f) {
+        return '<details><summary>' + f[0] + svg(P.down, 18, '#023819', 2) + '</summary><p class="muted" style="margin:0 0 14px;font-size:13.5px;line-height:1.6">' + f[1] + '</p></details>';
+      }).join('') + '</div>';
+  }
+  return '<section class="screen" aria-label="' + PAGES[k][0] + '">' + backBar(PAGES[k][0]) +
+    '<div class="scroll" data-scroll><div style="padding:4px 20px 24px;display:flex;flex-direction:column;gap:14px">' + body + '</div></div></section>';
+}
+
+/* ================= shell ================= */
+function backBar(title) {
+  return '<header class="bar"><button class="icon-btn" type="button" aria-label="Back" data-act="back">' + svg(P.back, 22, '#023819', 2.2) + '</button>' +
+    '<span style="font-size:14px;font-weight:500" class="muted">' + esc(title) + '</span></header>';
+}
+function filters(items, cur, key) {
+  return '<div class="filters" role="tablist">' + items.map(function (f) {
+    var on = cur === f[0];
+    return '<button type="button" role="tab" aria-selected="' + on + '" class="filter' + (on ? ' on' : '') + '" data-act="filter" data-k="' + key + '" data-v="' + f[0] + '">' + f[1] + '</button>';
+  }).join('') + '</div>';
+}
+function tabbar() {
+  var pc = pendingCount();
+  var items = [['home', 'Home', P.home], ['quotes', 'Quotes', P.doc], ['shipments', 'Shipments', P.box], ['account', 'Account', P.user]];
+  return '<nav class="tabbar" aria-label="Main">' + items.map(function (it) {
+    var on = S.tab === it[0];
+    return '<button type="button" class="tab' + (on ? ' on' : '') + '"' + (on ? ' aria-current="page"' : '') + ' data-act="goTab" data-v="' + it[0] + '"><span class="ic">' + svg(it[2], 20, on ? '#023819' : '#5f665b', on ? 2 : 1.9) + '</span>' + it[1] +
+      (it[0] === 'quotes' && pc ? '<span class="count" aria-label="' + pc + ' pending">' + pc + '</span>' : '') + '</button>';
+  }).join('') + '</nav>';
+}
+function keyOf() { return S.view ? S.view + ':' + (S.view === 'ship' ? S.shipId : S.view === 'page' ? S.page : S.sel) : 'tab:' + S.tab + ':' + S.qFilter + ':' + S.sFilter; }
+var lastKey = null;
+function render() {
+  var sc = app.querySelector('[data-scroll]'); if (sc && lastKey) memo[lastKey] = sc.scrollTop;
+  var h;
+  if (S.view === 'quote') h = quoteDetail() + (S.sheet === 'accept' ? acceptSheet() : S.sheet === 'reject' ? rejectSheet() : '');
+  else if (S.view === 'accepted' || S.view === 'rejected') h = doneScreen(S.view);
+  else if (S.view === 'ship') h = shipDetail() + (S.sheet === 'upload' ? uploadSheet() : '');
+  else if (S.view === 'page') h = accountPage();
+  else h = '<section class="screen">' + ({ home: homeTab, quotes: quotesTab, shipments: shipmentsTab, account: accountTab })[S.tab]() + tabbar() + '</section>' + (S.sheet === 'company' || S.sheet === 'contact' ? editSheet(S.sheet) : '');
+  app.innerHTML = h;
+  var key = keyOf(), nsc = app.querySelector('[data-scroll]');
+  if (nsc) nsc.scrollTop = memo[key] || 0;
+  lastKey = key;
+  if (S.sheet === 'reject') {
+    syncReject();
+    if (lastSheet !== 'reject') setTimeout(function () { var t = document.getElementById('reason'); if (t) t.focus(); }, 300);
+  }
+  if (S.sheet === 'accept' && lastSheet !== 'accept') setTimeout(function () { var b = app.querySelector('[data-act="confirmAccept"]'); if (b) b.focus({ preventScroll: true }); }, 300);
+  if ((S.sheet === 'company' || S.sheet === 'contact') && lastSheet !== S.sheet) setTimeout(function () { var f = app.querySelector('.inp'); if (f) f.focus(); }, 300);
+  lastSheet = S.sheet;
+}
+
+var toastEl = document.getElementById('toast'), tt;
+function toast(msg) {
+  toastEl.innerHTML = svg(P.check, 16, '#BFFB4F', 2.6) + '<span>' + esc(msg) + '</span>';
+  toastEl.style.bottom = S.view ? 'calc(24px + var(--safe-b))' : '';
+  toastEl.hidden = false; clearTimeout(tt); tt = setTimeout(function () { toastEl.hidden = true; }, 2800);
+}
+
+/* ================= actions ================= */
+var ACT = {
+  restart: function () { S = fresh(); memo = {}; toastEl.hidden = true; render(); },
+  goTab: function (t, el) { var f = el && el.getAttribute('data-f'); if (f) { if (t === 'quotes') S.qFilter = f; else S.sFilter = f; } S.tab = t; S.view = null; S.sheet = null; S.from = null; render(); },
+  filter: function (v, el) { S[el.getAttribute('data-k')] = v; render(); },
+  back: function () {
+    if (S.view === 'ship' && S.from === 'quote') { S.view = 'quote'; S.from = null; }
+    else { S.view = null; S.sheet = null; }
+    render();
+  },
+  openQuote: function (id) { S.sel = id; S.view = 'quote'; S.sheet = null; S.reason = ''; S.err = false; if (S.tab !== 'home') S.tab = 'quotes'; render(); },
+  openShip: function (id) { S.from = S.view === 'quote' ? 'quote' : null; S.shipId = id; S.view = 'ship'; S.sheet = null; if (!S.from && S.tab !== 'home') S.tab = 'shipments'; render(); },
+  openPage: function (k) { S.page = k; S.view = 'page'; render(); },
+  pref: function (k) { S.prefs[k] = !S.prefs[k]; render(); },
+  signOut: function () { toast('Sign out is disabled in this prototype'); },
+  toast: function (msg) { toast(msg); },
+  openUpload: function (t) { S.up = { type: t || null, file: null, note: '', tried: false }; S.sheet = 'upload'; render(); },
+  upType: function (t) { S.up.type = t; render(); },
+  pickFile: function () { var f = document.getElementById('filepick'); f.value = ''; f.click(); },
+  sendDoc: function () {
+    var u = S.up;
+    if (!u.type || !u.file) { u.tried = true; render(); return; }
+    var d = S.docs[S.shipId] || (S.docs[S.shipId] = { need: [], files: [] });
+    d.files.unshift({ type: u.type, file: u.file.name, from: 'You', date: '10 Nov', review: true });
+    d.need = d.need.filter(function (t) { return t !== u.type; });
+    S.sheet = null; S.up = null; render(); toast(u.type + ' sent to OnePort');
+  },
+  openEdit: function (w) { S.ferr = {}; S.sheet = w; render(); },
+  openAccept: function () { S.sheet = 'accept'; render(); },
+  openReject: function () { S.sheet = 'reject'; S.err = false; render(); },
+  close: function () { S.sheet = null; S.err = false; S.up = null; S.ferr = {}; render(); },
+  confirmAccept: function () {
+    var q = find(QUOTES, S.sel), sid = 'SH-' + (1060 + S.newShips.length), customs = q.svc === 'customs';
+    var first = q.from;
+    S.newShips.unshift({ id: sid, stage: 1, svc: q.svc, service: q.service, from: q.from, to: q.to, load: loadOf(q), cargo: 'From quote ' + q.id,
+      facts: [[customs ? 'Terminal' : q.svc === 'air' ? 'Flight' : 'Vessel', 'Being confirmed'], ['Quote', q.id]], eta: 'To be confirmed',
+      update: 'We’re confirming the details with your sales contact. Expect an update within 24 hours.',
+      ms: customs ? [['10 Nov', 'Quote ' + q.id + ' accepted'], ['—', 'Joint examination'], ['—', 'NCS assessment'], ['—', 'Release & exit note'], ['—', q.to]]
+                  : [['10 Nov', 'Quote ' + q.id + ' accepted'], ['—', first], ['—', 'Departs ' + q.from.split(',')[0]], ['—', q.to], ['—', 'Your delivery address']] });
+    S.docs[sid] = { need: customs ? ['Form M', 'Bill of lading', 'Commercial invoice'] : ['Commercial invoice', 'Packing list'], files: [{ type: 'Accepted quote', file: q.id + '.pdf', from: 'OnePort', date: '10 Nov', review: false }] };
+    S.st[q.id] = 'accepted'; S.dec[q.id] = { on: TODAY, reason: '', ship: sid };
+    S.sheet = null; S.view = 'accepted'; render();
+  },
+  submitReject: function () {
+    if (!S.reason.trim()) { S.err = true; syncReject(); document.getElementById('reason').focus(); return; }
+    S.st[S.sel] = 'rejected'; S.dec[S.sel] = { on: TODAY, reason: S.reason.trim(), ship: null };
+    S.sheet = null; S.view = 'rejected'; S.reason = ''; S.err = false; render();
+  }
+};
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('[data-act]'); if (!b) return;
+  var fn = ACT[b.getAttribute('data-act')]; if (fn) fn(b.getAttribute('data-v'), b);
+});
+document.getElementById('filepick').addEventListener('change', function (e) {
+  var f = e.target.files && e.target.files[0]; if (!f || !S.up) return;
+  var kb = f.size / 1024;
+  S.up.file = { name: f.name, size: kb > 1024 ? (kb / 1024).toFixed(1) + ' MB' : Math.max(1, Math.round(kb)) + ' KB' };
+  render();
+});
+app.addEventListener('submit', function (e) {
+  var form = e.target.closest('[data-form]'); if (!form) return;
+  e.preventDefault();
+  var which = form.getAttribute('data-form'), next = {}, errs = {};
+  EDIT[which].fields.forEach(function (f) {
+    var v = document.getElementById('ed-' + f[0]).value.trim(); next[f[0]] = v;
+    if (f[2] && !v) errs[f[0]] = f[1] + ' is required.';
+    else if (f[0] === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) errs[f[0]] = 'Enter a valid email address.';
+  });
+  if (Object.keys(errs).length) { Object.assign(S[which], next); S.ferr = errs; render(); return; }
+  Object.assign(S[which], next); S.ferr = {}; S.sheet = null; render();
+  toast(which === 'company' ? 'Company details updated' : 'Contact details updated');
+});
+app.addEventListener('input', function (e) {
+  if (e.target.id === 'upnote' && S.up) { S.up.note = e.target.value; return; }
+  if (e.target.id !== 'reason') return;
+  S.reason = e.target.value.slice(0, 500);
+  if (S.err && S.reason.trim()) S.err = false;
+  syncReject();
+});
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && S.sheet) ACT.close(); });
+
+render();
+})();
+</script>
+</body>
+</html>
