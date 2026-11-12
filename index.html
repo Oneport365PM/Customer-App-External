@@ -159,6 +159,26 @@ details[open] summary svg{transform:rotate(180deg)}
 .link{all:unset;cursor:pointer;font-size:13px;font-weight:600;color:#2F7A3F;padding:8px 0}
 .link:focus-visible{outline:2px solid var(--green)}
 
+/* ---------- login ---------- */
+.login{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--green)}
+.login-top{flex-shrink:0;padding:56px 24px 36px;color:var(--cream)}
+.login-top .mark{width:48px;height:48px;border-radius:14px;background:var(--lime);display:grid;place-items:center;margin-bottom:20px}
+.login-top h1{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.15;letter-spacing:-.02em;margin:0;color:#fff}
+.login-top h1 b{color:var(--lime);font-weight:600}
+.login-top p{margin:10px 0 0;font-size:14.5px;line-height:1.55;color:var(--light);max-width:300px}
+.login-body{flex:1;min-height:0;overflow-y:auto;background:var(--cream);border-radius:24px 24px 0 0;padding:28px 24px calc(24px + var(--safe-b));display:flex;flex-direction:column;gap:18px}
+.login-body h2{font-family:var(--display);font-weight:600;font-size:22px;color:var(--green);margin:0}
+.login-body .field{background:#fff}
+.login-body .field .flabel{background:#fff}
+.pw-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:40px;height:40px;border:none;background:transparent;border-radius:8px;display:grid;place-items:center;cursor:pointer}
+.pw-toggle:hover{background:rgba(2,56,25,.06)}
+.check{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink);cursor:pointer}
+.check input{width:20px;height:20px;margin:0;accent-color:var(--green)}
+.btn-busy{opacity:.75;cursor:progress}
+.spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(2,56,25,.25);border-top-color:var(--green);animation:spin .8s linear infinite;margin-right:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.formerr{background:#FDE0E0;color:#8f1010;border-radius:10px;padding:12px 14px;font-size:13.5px;line-height:1.5}
+
 /* ---------- finance ---------- */
 .seg{flex-shrink:0;margin:4px 20px 6px;display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#E6EADF;border-radius:12px;padding:4px}
 .seg button{all:unset;cursor:pointer;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600;color:var(--muted)}
@@ -247,7 +267,7 @@ details[open] summary svg{transform:rotate(180deg)}
   <aside class="intro" aria-label="About this prototype">
     <div class="brand">OnePort<b>&nbsp;365</b></div>
     <h1>Customer app prototype</h1>
-    <p>See what needs your attention, track shipments and send documents, review quotes and invoices under Finance (including multi-currency), and manage your account. Accepting a quote creates a shipment you can follow. Everything on the phone is clickable.</p>
+    <p>Sign in, see what needs your attention, track shipments and send documents, review quotes and invoices under Finance (including multi-currency), and manage your account. Accepting a quote creates a shipment you can follow. Everything on the phone is clickable.</p>
     <button class="restart" type="button" data-act="restart">Restart demo</button>
   </aside>
   <div class="phone"><div class="app"><div id="app" style="position:absolute;inset:0"></div><div class="toast" id="toast" role="status" hidden></div><input type="file" id="filepick" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx" hidden></div></div>
@@ -515,6 +535,9 @@ var P = {
   file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
   upload: '<path d="M12 16V4M7 9l5-5 5 5M5 20h14"/>',
   dl: '<path d="M12 4v12M7 11l5 5 5-5M5 20h14"/>',
+  eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff: '<path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17 17 0 0 0 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
   wallet: '<path d="M4 7h15a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 7l11-3v3M16 13.5h.01"/>',
   receipt: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
@@ -532,7 +555,8 @@ function shipChip(s) {
 /* ---------- state ---------- */
 var S, app = document.getElementById('app'), lastSheet = null, memo = {};
 function fresh() {
-  var s = { tab: 'home', view: null, from: null, sel: QUOTES[0].id, shipId: null, page: null, sheet: null,
+  var s = { auth: false, login: { email: 'tunde@kolaimports.ng', pw: '', show: false, remember: true, err: {}, busy: false, mode: 'signin', sent: false, formErr: '' },
+    tab: 'home', view: null, from: null, sel: QUOTES[0].id, shipId: null, page: null, sheet: null,
     st: {}, dec: {}, reason: '', err: false, qFilter: 'all', sFilter: 'active', newShips: [], prefs: {},
     docs: {}, up: null, fin: 'quotes', iFilter: 'all', inv: {}, invId: null, company: Object.assign({}, COMPANY0), contact: Object.assign({}, CONTACT0), ferr: {} };
   Object.keys(DOCS).forEach(function (k) { s.docs[k] = { need: DOCS[k].need.slice(), files: DOCS[k].files.map(function (f) { return { type: f[0], file: f[1], from: f[2], date: f[3], review: false }; }) }; });
@@ -968,6 +992,47 @@ function accountPage() {
     '<div class="scroll" data-scroll><div style="padding:4px 20px 24px;display:flex;flex-direction:column;gap:14px">' + body + '</div></div></section>';
 }
 
+/* ================= LOGIN ================= */
+function loginScreen() {
+  var L = S.login, e = L.err;
+  var top = '<div class="login-top"><span class="mark">' + svg(P.arrow, 24, '#023819', 2.4) + '</span>' +
+    '<h1>OnePort <b>365</b></h1><p>Your quotes, shipments, documents and invoices in one place.</p></div>';
+  var field = function (id, label, type, val, err, extra) {
+    return '<div><label class="field compact' + (val ? ' filled' : '') + (err ? ' error' : '') + '" style="position:relative"><span class="flabel">' + label + '</span>' +
+      '<input class="inp" id="' + id + '" type="' + type + '" value="' + esc(val) + '"' + (extra || '') + (err ? ' aria-invalid="true" aria-describedby="' + id + '-err"' : '') + '></label>' +
+      (err ? '<div class="ferr" id="' + id + '-err">' + err + '</div>' : '') + '</div>';
+  };
+  var body;
+  if (L.mode === 'forgot' && L.sent) {
+    body = '<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding-top:12px" role="status">' +
+      '<span class="done-ic" style="background:#BFFB4F">' + svg(P.check, 34, '#023819', 2.8) + '</span>' +
+      '<h2>Check your email</h2><p class="muted" style="margin:0;font-size:14.5px;line-height:1.55">We’ve sent a link to reset your password to <b style="color:#023819">' + esc(L.email) + '</b>. It expires in 30 minutes.</p></div>' +
+      '<button type="button" class="btn btn-solid" data-act="loginMode" data-v="signin">Back to sign in</button>' +
+      '<button type="button" class="btn btn-text" data-act="resend">Didn’t get it? Send again</button>';
+  } else if (L.mode === 'forgot') {
+    body = '<form id="forgotForm" novalidate style="display:flex;flex-direction:column;gap:18px"><div><h2>Reset your password</h2><p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.5">Enter the email you use for OnePort 365 and we’ll send you a reset link.</p></div>' +
+      field('li-email', 'Email address', 'email', L.email, e.email, ' autocomplete="email" inputmode="email"') +
+      '<button type="submit" class="btn btn-accent">Send reset link</button>' +
+      '<button type="button" class="btn btn-text" data-act="loginMode" data-v="signin">' + svg(P.back, 16, '#023819', 2.2) + '<span style="margin-left:6px">Back to sign in</span></button></form>';
+  } else {
+    body = '<form id="loginForm" novalidate style="display:flex;flex-direction:column;gap:18px"><div><h2>Sign in</h2><p class="muted" style="margin:6px 0 0;font-size:14.5px">Welcome back. Sign in to your customer account.</p></div>' +
+      (L.formErr ? '<div class="formerr" role="alert">' + L.formErr + '</div>' : '') +
+      field('li-email', 'Email address', 'email', L.email, e.email, ' autocomplete="email" inputmode="email"') +
+      '<div><label class="field compact' + (L.pw ? ' filled' : '') + (e.pw ? ' error' : '') + '" style="position:relative;padding-right:52px"><span class="flabel">Password</span>' +
+        '<input class="inp" id="li-pw" type="' + (L.show ? 'text' : 'password') + '" value="' + esc(L.pw) + '" autocomplete="current-password"' + (e.pw ? ' aria-invalid="true" aria-describedby="li-pw-err"' : '') + '>' +
+        '<button type="button" class="pw-toggle" data-act="togglePw" aria-label="' + (L.show ? 'Hide password' : 'Show password') + '" aria-pressed="' + L.show + '">' + svg(L.show ? P.eyeoff : P.eye, 20, '#5f665b', 1.9) + '</button></label>' +
+        (e.pw ? '<div class="ferr" id="li-pw-err">' + e.pw + '</div>' : '') + '</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><label class="check"><input type="checkbox" id="li-remember"' + (L.remember ? ' checked' : '') + '>Remember me</label>' +
+        '<button type="button" class="link" data-act="loginMode" data-v="forgot">Forgot password?</button></div>' +
+      '<button type="submit" class="btn ' + (L.busy ? 'btn-accent btn-busy' : 'btn-accent') + '"' + (L.busy ? ' aria-busy="true" disabled' : '') + '>' + (L.busy ? '<span class="spin" aria-hidden="true"></span>Signing in…' : 'Sign in') + '</button>' +
+      '<p class="muted" style="margin:4px 0 0;text-align:center;font-size:13.5px;line-height:1.55">New to OnePort 365? <button type="button" class="link" style="padding:0" data-act="toast" data-v="Your OnePort sales contact will set up your account">Contact us to get access</button></p>' +
+      '<p class="muted" style="margin:auto 0 0;text-align:center;font-size:12px;line-height:1.5">Prototype: use any email and a password of 6+ characters. Type “wrongpass” as the password to see the sign-in error.</p>' +
+      '</form>';
+  }
+  return '<section class="login" aria-label="Sign in">' + top + '<div class="login-body">' + body + '</div></section>';
+}
+function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
 /* ================= shell ================= */
 function backBar(title) {
   return '<header class="bar"><button class="icon-btn" type="button" aria-label="Back" data-act="back">' + svg(P.back, 22, '#023819', 2.2) + '</button>' +
@@ -993,7 +1058,8 @@ var lastKey = null;
 function render() {
   var sc = app.querySelector('[data-scroll]'); if (sc && lastKey) memo[lastKey] = sc.scrollTop;
   var h;
-  if (S.view === 'quote') h = quoteDetail() + (S.sheet === 'accept' ? acceptSheet() : S.sheet === 'reject' ? rejectSheet() : '');
+  if (!S.auth) h = loginScreen();
+  else if (S.view === 'quote') h = quoteDetail() + (S.sheet === 'accept' ? acceptSheet() : S.sheet === 'reject' ? rejectSheet() : '');
   else if (S.view === 'accepted' || S.view === 'rejected') h = doneScreen(S.view);
   else if (S.view === 'ship') h = shipDetail() + (S.sheet === 'upload' ? uploadSheet() : '');
   else if (S.view === 'page') h = accountPage();
@@ -1052,7 +1118,10 @@ var ACT = {
   openShip: function (id) { S.from = S.view === 'quote' ? 'quote' : S.view === 'invoice' ? 'invoice' : null; S.shipId = id; S.view = 'ship'; S.sheet = null; if (!S.from && S.tab !== 'home') S.tab = 'shipments'; render(); },
   openPage: function (k) { S.page = k; S.view = 'page'; render(); },
   pref: function (k) { S.prefs[k] = !S.prefs[k]; render(); },
-  signOut: function () { toast('Sign out is disabled in this prototype'); },
+  signOut: function () { var em = S.contact.email; S = fresh(); memo = {}; S.login.email = em; toastEl.hidden = true; render(); toast('You’ve been signed out'); },
+  togglePw: function () { var i = document.getElementById('li-pw'); if (i) S.login.pw = i.value; S.login.show = !S.login.show; render(); var n = document.getElementById('li-pw'); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } },
+  loginMode: function (m) { var i = document.getElementById('li-email'); if (i) S.login.email = i.value.trim(); S.login.mode = m; S.login.sent = false; S.login.err = {}; S.login.formErr = ''; render(); },
+  resend: function () { toast('Reset link sent again'); },
   toast: function (msg) { toast(msg); },
   openUpload: function (t) { S.up = { type: t || null, file: null, note: '', tried: false }; S.sheet = 'upload'; render(); },
   upType: function (t) { S.up.type = t; render(); },
@@ -1098,6 +1167,26 @@ document.getElementById('filepick').addEventListener('change', function (e) {
   render();
 });
 app.addEventListener('submit', function (e) {
+  if (e.target.id === 'loginForm' || e.target.id === 'forgotForm') {
+    e.preventDefault();
+    var L = S.login, em = document.getElementById('li-email').value.trim(), pwEl = document.getElementById('li-pw');
+    L.email = em; L.err = {}; L.formErr = '';
+    if (!em) L.err.email = 'Enter your email address.';
+    else if (!validEmail(em)) L.err.email = 'Enter a valid email address, like name@company.com.';
+    if (e.target.id === 'forgotForm') { if (!L.err.email) L.sent = true; render(); return; }
+    L.pw = pwEl.value; L.remember = document.getElementById('li-remember').checked;
+    if (!L.pw) L.err.pw = 'Enter your password.';
+    else if (L.pw.length < 6) L.err.pw = 'Password must be at least 6 characters.';
+    if (L.err.email || L.err.pw) { render(); var f = document.querySelector('[aria-invalid="true"]'); if (f) f.focus(); return; }
+    L.busy = true; render();
+    setTimeout(function () {
+      L.busy = false;
+      if (L.pw.toLowerCase() === 'wrongpass') { L.formErr = 'The email or password is incorrect. Try again or reset your password.'; L.pw = ''; render(); return; }
+      S.auth = true; S.tab = 'home'; S.view = null; render();
+      toast('Welcome back, ' + S.contact.name.split(' ')[0]);
+    }, 900);
+    return;
+  }
   var form = e.target.closest('[data-form]'); if (!form) return;
   e.preventDefault();
   var which = form.getAttribute('data-form'), next = {}, errs = {};
@@ -1111,6 +1200,8 @@ app.addEventListener('submit', function (e) {
   toast(which === 'company' ? 'Company details updated' : 'Contact details updated');
 });
 app.addEventListener('input', function (e) {
+  if (e.target.id === 'li-email') { S.login.email = e.target.value; return; }
+  if (e.target.id === 'li-pw') { S.login.pw = e.target.value; return; }
   if (e.target.id === 'upnote' && S.up) { S.up.note = e.target.value; return; }
   if (e.target.id !== 'reason') return;
   S.reason = e.target.value.slice(0, 500);
