@@ -1166,7 +1166,7 @@ document.getElementById('filepick').addEventListener('change', function (e) {
   S.up.file = { name: f.name, size: kb > 1024 ? (kb / 1024).toFixed(1) + ' MB' : Math.max(1, Math.round(kb)) + ' KB' };
   render();
 });
-app.addEventListener('submit', function (e) {
+var onSubmit = function (e) {
   if (e.target.id === 'loginForm' || e.target.id === 'forgotForm') {
     e.preventDefault();
     var L = S.login, em = document.getElementById('li-email').value.trim(), pwEl = document.getElementById('li-pw');
@@ -1198,7 +1198,23 @@ app.addEventListener('submit', function (e) {
   if (Object.keys(errs).length) { Object.assign(S[which], next); S.ferr = errs; render(); return; }
   Object.assign(S[which], next); S.ferr = {}; S.sheet = null; render();
   toast(which === 'company' ? 'Company details updated' : 'Contact details updated');
-});
+};
+app.addEventListener('submit', onSubmit);
+/* Some previews (e.g. sandboxed iframes without allow-forms) block native form
+   submission, so the submit event never fires. Handle the submit button click
+   and Enter in a field ourselves, and call the same handler. */
+function submitForm(form) { onSubmit({ target: form, preventDefault: function () {} }); }
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('button[type=submit]'); if (!b || b.disabled) return;
+  var f = b.closest('form'); if (!f) return;
+  e.preventDefault(); e.stopPropagation(); submitForm(f);
+}, true);
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter' || e.isComposing) return;
+  var t = e.target; if (!t.matches || !t.matches('input:not([type=checkbox]):not([type=radio])')) return;
+  var f = t.closest('form'); if (!f) return;
+  e.preventDefault(); submitForm(f);
+}, true);
 app.addEventListener('input', function (e) {
   if (e.target.id === 'li-email') { S.login.email = e.target.value; return; }
   if (e.target.id === 'li-pw') { S.login.pw = e.target.value; return; }
