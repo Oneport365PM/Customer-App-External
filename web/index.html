@@ -741,7 +741,7 @@ function quotesPage() {
   var counts = { all: QUOTES.length, pending: 0, accepted: 0, rejected: 0 };
   QUOTES.forEach(function (q) { counts[S.st[q.id]]++; });
   var shown = QUOTES.filter(function (q) { return S.qFilter === 'all' || S.st[q.id] === S.qFilter; });
-  var h = pageHead('Quotes', 'Quotes OnePort has shared with ' + esc(S.company.name) + '. Open one to review the full breakdown and decide.');
+  var h = pageHead('Quotes');
   h += tabs([['all', 'All', counts.all], ['pending', 'Pending', counts.pending], ['accepted', 'Accepted', counts.accepted], ['rejected', 'Rejected', counts.rejected]], S.qFilter, 'qFilter');
   h += '<div class="card"><div class="tablewrap"><table class="data"><thead><tr><th>Quote</th><th>Service</th><th>Route</th><th>Quoted</th><th>Valid until</th><th class="r">Total</th><th>Status</th></tr></thead><tbody>';
   shown.forEach(function (q) {
