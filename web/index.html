@@ -574,7 +574,7 @@ function shipChip(s) {
 var S, root = document.getElementById('root');
 var PAGES = { dashboard: 1, shipments: 1, quotes: 1, invoices: 1, account: 1 };
 function fresh() {
-  var s = { auth: false, login: { email: 'tunde@kolaimports.ng', pw: '', show: false, remember: true, err: {}, busy: false, mode: 'signin', sent: false, formErr: '' },
+  var s = { auth: false, login: { email: 'tunde@kolaimports.ng', pw: 'demo1234', show: false, remember: true, err: {}, busy: false, mode: 'signin', sent: false, formErr: '' },
     page: 'dashboard', detail: null, modal: null,
     st: {}, dec: {}, qFilter: 'all', sFilter: 'active', iFilter: 'all', newShips: [], prefs: {}, docs: {}, inv: {},
     company: Object.assign({}, COMPANY0), contact: Object.assign({}, CONTACT0) };
@@ -649,7 +649,7 @@ function loginScreen() {
         '<button type="button" class="link" data-act="loginMode" data-v="forgot">Forgot password?</button></div>' +
       '<button type="submit" class="btn btn-accent block"' + (L.busy ? ' aria-busy="true" disabled style="opacity:.8;cursor:progress"' : '') + '>' + (L.busy ? '<span class="spin" aria-hidden="true"></span>Signing in…' : 'Sign in') + '</button>' +
       '<p class="muted" style="margin:0;text-align:center;font-size:13.5px">New to OnePort 365? <button type="button" class="link" data-act="toast" data-v="Your OnePort sales contact will set up your account">Contact us to get access</button></p>' +
-      '<p class="muted" style="margin:8px 0 0;text-align:center;font-size:12px;line-height:1.5">Prototype: any email and a password of 6+ characters signs you in. Use “wrongpass” to see the sign-in error.</p></form>';
+      '<p class="muted" style="margin:8px 0 0;text-align:center;font-size:12px;line-height:1.5">Prototype: the demo password is already filled in. Just press Sign in. Any email and a password of 6+ characters work; use “wrongpass” to see the sign-in error.</p></form>';
   }
   var feats = [[P.doc, 'Review and decide on quotes', 'See every charge, in every currency, then accept or reject.'],
                [P.box, 'Track every shipment', 'Live progress, documents and updates from our team.'],
