@@ -780,7 +780,6 @@ function quoteDetail() {
     '<details><summary>Your sales contact' + svg(P.down, 18, '#023819', 2) + '</summary><p style="margin:0 0 14px;font-size:13.5px;line-height:1.6" class="muted"><b style="color:#023819">' + esc(q.contact[0]) + '</b><br>' + esc(q.contact[1]) + '</p></details></div>';
   h += '</div></div>';
   if (st === 'pending') h += '<div class="actions"><button type="button" class="btn btn-outline" data-act="openReject">Reject Quote</button><button type="button" class="btn btn-accent" data-act="openAccept">Accept Quote</button></div>';
-  if (st === 'accepted' && d.ship) h += '<div class="actions one"><button type="button" class="btn btn-solid" data-act="openShip" data-v="' + d.ship + '">Track shipment ' + d.ship + '</button></div>';
   return h + '</section>';
 }
 

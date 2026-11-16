@@ -769,7 +769,7 @@ function quoteDetail() {
     '<span style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap">' + svcCell(q.svc, q.service) + '<span>·</span><span>' + q.id + '</span><span>·</span><span>Quoted ' + q.date + '</span>' + chip(st) + '</span>', '',
     '<a href="#/quotes">Quotes</a><span>/</span><span>' + q.id + '</span>');
   var main = '';
-  if (st === 'accepted') main += '<p class="banner" role="status" style="background:#E1F1E8;color:#0b5a33">You accepted this quote on ' + d.on + (d.ship ? ' and it was booked as shipment <a href="#/shipments/' + d.ship + '" style="color:#0b5a33;font-weight:600">' + d.ship + '</a>.' : '.') + ' Our team will contact you regarding the next steps.</p>';
+  if (st === 'accepted') main += '<p class="banner" role="status" style="background:#E1F1E8;color:#0b5a33">You accepted this quote on ' + d.on + (d.ship ? ' and it was booked as shipment <b>' + d.ship + '</b>.' : '.') + ' Our team will contact you regarding the next steps.</p>';
   if (st === 'rejected') main += '<p class="banner" role="status" style="background:#EDEFE8;color:#023819">You rejected this quote on ' + d.on + '. <span class="muted">Reason: “' + esc(d.reason) + '”</span></p>';
   main += '<section class="card"><div class="card-h"><h2>Shipment details</h2></div><div class="card-b"><div class="kv">' +
     q.details.map(function (r) { return '<div><div class="k">' + r[0] + '</div><div class="v">' + esc(r[1]) + '</div></div>'; }).join('') + '</div></div></section>';
@@ -780,7 +780,6 @@ function quoteDetail() {
     (multiCur ? '<div class="curnote">' + svg(P.info, 16, '#5f665b', 2) + '<span>' + CUR_NOTE + '</span></div>' : '') +
     '<div style="margin-top:14px">' + '<div class="row"><span>Valid until</span><span' + (st === 'pending' ? ' style="color:#7a5d00;font-weight:600"' : '') + '>' + q.validUntil + '</span></div><div class="row"><span>Quote date</span><span>' + q.date + '</span></div><div class="row"><span>Route</span><span>' + q.route + '</span></div></div>' +
     (st === 'pending' ? '<div style="display:flex;flex-direction:column;gap:10px;margin-top:18px"><button type="button" class="btn btn-accent block" data-act="modal" data-v="accept">' + svg(P.check, 18, '#023819', 2.6) + 'Accept Quote</button><button type="button" class="btn btn-outline block" data-act="modal" data-v="reject">' + svg(P.x, 17, '#023819', 2.4) + 'Reject Quote</button></div>' : '') +
-    (st === 'accepted' && d.ship ? '<a class="btn btn-solid block" style="margin-top:18px" href="#/shipments/' + d.ship + '">' + svg(P.box, 18, '#FDFBF1', 2) + 'Track shipment ' + d.ship + '</a>' : '') +
     '</div></section>' +
     '<section class="card"><div class="card-b" style="display:flex;align-items:center;gap:12px"><span class="mono round">' + initials(q.contact[0]) + '</span><div style="min-width:0"><div class="muted" style="font-size:12.5px">Your sales contact</div><div style="font-weight:600;color:#023819">' + esc(q.contact[0]) + '</div><a href="mailto:' + esc(q.contact[1]) + '?subject=' + encodeURIComponent('Quote ' + q.id) + '" style="font-size:13px">' + esc(q.contact[1]) + '</a></div></div></section>';
   return h + '<div class="split"><div class="stack">' + main + '</div><aside class="aside" aria-label="Quote summary">' + aside + '</aside></div>';
