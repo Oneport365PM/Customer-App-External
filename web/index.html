@@ -957,7 +957,7 @@ function modalHTML() {
       '<h2 id="dlg-t" class="disp" style="font-weight:600;font-size:24px;color:#023819;margin:4px 0 0">' + (ok ? 'Quote accepted' : 'Rejection submitted') + '</h2>' +
       '<p style="margin:0;font-size:15px;line-height:1.6;max-width:380px">' + (ok ? 'Your quote has been accepted. Our team will contact you regarding the next steps.' : 'Thank you. We’ve received your rejection and feedback. Our team will review it and may follow up with a revised quote.') + '</p>' +
       '<p class="muted" style="margin:0;font-size:13px">' + S.detail + (ok ? ' · Booked as shipment ' + m.ship : ' · Rejected') + '</p></div>' +
-      '<div class="df" style="justify-content:center">' + (ok ? '<button type="button" class="btn btn-ghost" data-act="close">Close</button><button type="button" class="btn btn-solid" data-act="goClose" data-v="shipments/' + m.ship + '">Track shipment</button>' : '<button type="button" class="btn btn-ghost" data-act="close">Close</button><button type="button" class="btn btn-solid" data-act="goClose" data-v="quotes">Back to quotes</button>') + '</div></div></div>';
+      '<div class="df" style="justify-content:center">' + (ok ? '<button type="button" class="btn btn-solid" data-act="close">Close</button>' : '<button type="button" class="btn btn-ghost" data-act="close">Close</button><button type="button" class="btn btn-solid" data-act="goClose" data-v="quotes">Back to quotes</button>') + '</div></div></div>';
   }
   if (m.type === 'reject') {
     var filled = (m.reason || '').trim().length > 0;

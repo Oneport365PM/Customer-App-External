@@ -823,7 +823,7 @@ function doneScreen(kindOf) {
   var msg = ok ? 'Your quote has been accepted. Our team will contact you regarding the next steps.'
                : 'Thank you. We’ve received your rejection and feedback. Our team will review it and may follow up with a revised quote.';
   var meta = ok ? q.id + ' · Booked as shipment ' + d.ship : q.id + ' · Rejected';
-  var btns = ok ? '<button type="button" class="btn btn-solid" data-act="openShip" data-v="' + d.ship + '">Track shipment</button><button type="button" class="btn btn-text" data-act="goTab" data-v="finance" data-f="quotes">Back to quotes</button>'
+  var btns = ok ? '<button type="button" class="btn btn-solid" data-act="goTab" data-v="finance" data-f="quotes">Back to quotes</button>'
                 : '<button type="button" class="btn btn-solid" data-act="goTab" data-v="finance" data-f="quotes">Back to quotes</button><button type="button" class="btn btn-text" data-act="openQuote" data-v="' + q.id + '">View quote</button>';
   return '<section class="screen" aria-label="' + title + '"><div class="done" role="status">' + icon +
     '<h1 class="disp" style="font-weight:600;font-size:26px;color:#023819;margin:8px 0 0">' + title + '</h1>' +
